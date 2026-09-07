@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bovary Now — Admin Panel</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #08090b;
+            color: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 70px;
+            border-bottom: 1px solid #24262b;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            background: #0d0f12;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #181b20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .brand span {
+            font-size: 18px;
+        }
+
+        .admin-label {
+            color: #8e949d;
+            font-size: 13px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 230px 1fr;
+            min-height: calc(100vh - 70px);
+        }
+
+        .sidebar {
+            border-right: 1px solid #24262b;
+            background: #0b0d10;
+            padding: 24px 16px;
+        }
+
+        .nav-title {
+            color: #666c75;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin: 0 12px 12px;
+        }
+
+        .nav-item {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            color: #aeb3bb;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-item.active,
+        .nav-item:hover {
+            background: #181b20;
+            color: #ffffff;
+        }
+
+        .main {
+            padding: 32px;
+            max-width: 1500px;
+            width: 100%;
+            margin: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #858b94;
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #12161a;
+            border: 1px solid #252a30;
+            padding: 9px 13px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #b9c0c8;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #3bd16f;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: #101216;
+            border: 1px solid #24272d;
+            border-radius: 14px;
+            padding: 22px;
+        }
+
+        .card-label {
+            color: #777d86;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .card h2 {
+            font-size: 21px;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: #90969f;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .event-card {
+            grid-column: span 2;
+        }
+
+        .event-banner {
+            height: 190px;
+            margin: 18px 0;
+            border-radius: 10px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #171a20,
+                    #0b0d10
+                );
+            border: 1px solid #282c32;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555b64;
+            font-size: 13px;
+        }
+
+        .event-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .info-box {
+            background: #0c0e11;
+            border: 1px solid #202329;
+            border-radius: 9px;
+            padding: 13px;
+        }
+
+        .info-box small {
+            display: block;
+            color: #686e77;
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+
+        .info-box strong {
+            font-size: 14px;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        button {
+            border: 1px solid #30343b;
+            background: #181b20;
+            color: #ffffff;
+            padding: 11px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        button:hover {
+            background: #22262c;
+        }
+
+        .primary {
+            background: #ffffff;
+            color: #090a0c;
+            border-color: #ffffff;
+            font-weight: 700;
+        }
+
+        .primary:hover {
+            background: #dddddd;
+        }
+
+        .preview {
+            min-height: 420px;
+        }
+
+        .phone {
+            width: 210px;
+            margin: 18px auto 0;
+            background: #08090b;
+            border: 7px solid #1c1f24;
+            border-radius: 25px;
+            padding: 16px 12px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);
+        }
+
+        .phone-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .phone-status {
+            color: #f1c84b;
+            font-size: 10px;
+            margin-bottom: 10px;
+        }
+
+        .phone-banner {
+            height: 90px;
+            border-radius: 8px;
+            background: #181b20;
+            margin-bottom: 12px;
+        }
+
+        .phone h3 {
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .phone p {
+            color: #777d86;
+            font-size: 9px;
+            line-height: 1.5;
+        }
+
+        .phone-countdown {
+            font-size: 19px;
+            font-weight: 700;
+            margin: 12px 0;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .event-card {
+                grid-column: span 1;
+            }
+
+            .event-info {
+                grid-template-columns: 1fr;
+            }
+
+            .main {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand">
+        <div class="brand-mark">🏎️</div>
+        <span>BOVARY NOW</span>
+    </div>
+
+    <div class="admin-label">
+        ADMIN PANEL
+    </div>
+
+</header>
+
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="nav-title">
+            Management
+        </div>
+
+        <a href="#" class="nav-item active">
+            Dashboard
+        </a>
+
+        <a href="#" class="nav-item">
+            Events
+        </a>
+
+        <a href="#" class="nav-item">
+            Announcements
+        </a>
+
+        <a href="#" class="nav-item">
+            Notifications
+        </a>
+
+
+        <div class="nav-title" style="margin-top: 30px;">
+            System
+        </div>
+
+        <a href="#" class="nav-item">
+            Settings
+        </a>
+
+        <a href="#" class="nav-item">
+            Logout
+        </a>
+
+    </aside>
+
+
+    <main class="main">
+
+        <div class="page-header">
+
+            <div>
+                <h1>Dashboard</h1>
+
+                <p>
+                    Manage Bovary Now sessions and events.
+                </p>
+            </div>
+
+            <div class="status">
+                <span class="status-dot"></span>
+                System Online
+            </div>
+
+        </div>
+
+
+        <section class="grid">
+
+            <div class="card">
+
+                <div class="card-label">
+                    Current Status
+                </div>
+
+                <h2>🟡 Starting Soon</h2>
+
+                <p>
+                    The next Bovary session is scheduled.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-label">
+                    Next Event
+                </div>
+
+                <h2>JDM Night 🇯🇵</h2>
+
+                <p>
+                    07/09/2026 • 21:00
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-label">
+                    Host
+                </div>
+
+                <h2>Bovary Staff</h2>
+
+                <p>
+                    Event host
+                </p>
+
+            </div>
+
+
+            <div class="card event-card">
+
+                <div class="card-label">
+                    Current / Next Event
+                </div>
+
+                <h2>JDM Night 🇯🇵</h2>
+
+                <div class="event-banner">
+                    Event Banner
+                </div>
+
+                <div class="event-info">
+
+                    <div class="info-box">
+                        <small>Date</small>
+                        <strong>07/09/2026</strong>
+                    </div>
+
+                    <div class="info-box">
+                        <small>Time</small>
+                        <strong>21:00</strong>
+                    </div>
+
+                    <div class="info-box">
+                        <small>Host</small>
+                        <strong>Bovary Staff</strong>
+                    </div>
+
+                </div>
+
+                <div class="actions">
+
+                    <button class="primary">
+                        Edit Event
+                    </button>
+
+                    <button>
+                        Start Session
+                    </button>
+
+                    <button>
+                        End Session
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="card preview">
+
+                <div class="card-label">
+                    👁️ Live Preview
+                </div>
+
+                <div class="phone">
+
+                    <div class="phone-title">
+                        BOVARY NOW
+                    </div>
+
+                    <div class="phone-status">
+                        🟡 STARTING SOON
+                    </div>
+
+                    <div class="phone-banner"></div>
+
+                    <h3>
+                        JDM Night 🇯🇵
+                    </h3>
+
+                    <div class="phone-countdown">
+                        01:42:37
+                    </div>
+
+                    <p>
+                        A night dedicated to Japanese
+                        cars, builds and street culture.
+                    </p>
+
+                    <p style="margin-top: 10px;">
+                        Host: Bovary Staff
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>
