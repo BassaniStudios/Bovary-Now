@@ -1,550 +1,2364 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bovary Now — Admin Core</title>
+  <meta name="theme-color" content="#05050a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #05050a;
+      --bg-card: #0b0b14;
+      --bg-elevated: #12121c;
+      --bg-input: #0a0a12;
+      --border: rgba(124, 58, 237, 0.18);
+      --border-hover: rgba(167, 139, 250, 0.45);
+      --border-strong: rgba(124, 58, 237, 0.35);
+      --purple: #7c3aed;
+      --purple-bright: #c4b5fd;
+      --cyan: #22d3ee;
+      --pink: #f472b6;
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --text: #e8edf5;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --gradient: linear-gradient(135deg, #7c3aed, #f472b6);
+      --gradient-cyan: linear-gradient(135deg, #7c3aed, #22d3ee);
+      --font-display: 'Orbitron', sans-serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      --sidebar-w: 240px;
+      --topbar-h: 64px;
+    }
 
-    <title>Bovary Now — Admin Panel</title>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    html { scroll-behavior: smooth; }
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #08090b;
-            color: #f5f5f5;
-            min-height: 100vh;
-        }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
 
-        .topbar {
-            height: 70px;
-            border-bottom: 1px solid #24262b;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 32px;
-            background: #0d0f12;
-        }
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(124, 58, 237, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124, 58, 237, 0.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
+    .bg-glow {
+      position: fixed;
+      top: -15%;
+      left: 40%;
+      width: 70vw;
+      height: 50vh;
+      background: radial-gradient(ellipse, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        .brand-mark {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            background: #181b20;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--topbar-h);
+      z-index: 100;
+      background: rgba(5, 5, 10, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
 
-        .brand span {
-            font-size: 18px;
-        }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
 
-        .admin-label {
-            color: #8e949d;
-            font-size: 13px;
-        }
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: 0 0 18px rgba(124, 58, 237, 0.45);
+      flex-shrink: 0;
+    }
 
-        .layout {
-            display: grid;
-            grid-template-columns: 230px 1fr;
-            min-height: calc(100vh - 70px);
-        }
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
 
-        .sidebar {
-            border-right: 1px solid #24262b;
-            background: #0b0d10;
-            padding: 24px 16px;
-        }
+    .brand-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--text);
+    }
 
-        .nav-title {
-            color: #666c75;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin: 0 12px 12px;
-        }
+    .brand-sub {
+      font-family: var(--font-display);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      color: var(--purple-bright);
+      text-transform: uppercase;
+    }
 
-        .nav-item {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 5px;
-            border-radius: 8px;
-            color: #aeb3bb;
-            text-decoration: none;
-            font-size: 14px;
-        }
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+    }
 
-        .nav-item.active,
-        .nav-item:hover {
-            background: #181b20;
-            color: #ffffff;
-        }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .main {
-            padding: 32px;
-            max-width: 1500px;
-            width: 100%;
-            margin: auto;
-        }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(52, 211, 153, 0.7);
+      animation: pulse 2s ease-in-out infinite;
+    }
 
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 28px;
-        }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
 
-        .page-header h1 {
-            font-size: 30px;
-            margin-bottom: 8px;
-        }
+    .status-label { color: var(--cyan); }
 
-        .page-header p {
-            color: #858b94;
-            font-size: 14px;
-        }
+    .layout {
+      display: block;
+      min-height: 100vh;
+      padding-top: var(--topbar-h);
+      position: relative;
+      z-index: 1;
+    }
 
-        .status {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #12161a;
-            border: 1px solid #252a30;
-            padding: 9px 13px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: #b9c0c8;
-        }
+    .sidebar {
+      position: fixed;
+      top: var(--topbar-h);
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+      background: rgba(8, 8, 14, 0.95);
+      border-right: 1px solid var(--border);
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+      z-index: 50;
+    }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #3bd16f;
-        }
+    .nav-section {
+      font-family: var(--font-display);
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      color: var(--text-dim);
+      padding: 12px 14px 6px;
+      text-transform: uppercase;
+    }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-bottom: 24px;
-        }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.18s ease;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
 
-        .card {
-            background: #101216;
-            border: 1px solid #24272d;
-            border-radius: 14px;
-            padding: 22px;
-        }
+    .nav-item:hover {
+      background: rgba(124, 58, 237, 0.08);
+      color: var(--text);
+      border-color: var(--border);
+    }
 
-        .card-label {
-            color: #777d86;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-        }
+    .nav-item.active {
+      background: rgba(124, 58, 237, 0.15);
+      color: var(--purple-bright);
+      border-color: var(--border-strong);
+      box-shadow: 0 0 16px rgba(124, 58, 237, 0.12);
+    }
 
-        .card h2 {
-            font-size: 21px;
-            margin-bottom: 8px;
-        }
+    .nav-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.9;
+    }
 
-        .card p {
-            color: #90969f;
-            font-size: 13px;
-            line-height: 1.5;
-        }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px 12px 8px;
+      border-top: 1px solid var(--border);
+    }
 
-        .event-card {
-            grid-column: span 2;
-        }
+    .admin-info {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+      padding: 0 4px;
+    }
 
-        .event-banner {
-            height: 190px;
-            margin: 18px 0;
-            border-radius: 10px;
-            background:
-                linear-gradient(
-                    135deg,
-                    #171a20,
-                    #0b0d10
-                );
-            border: 1px solid #282c32;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #555b64;
-            font-size: 13px;
-        }
+    .admin-info strong {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
 
-        .event-info {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
+    .main {
+      margin-left: var(--sidebar-w);
+      padding: 28px 36px 48px;
+      width: calc(100% - var(--sidebar-w));
+      max-width: none;
+      box-sizing: border-box;
+    }
 
-        .info-box {
-            background: #0c0e11;
-            border: 1px solid #202329;
-            border-radius: 9px;
-            padding: 13px;
-        }
+    .page { display: none; }
+    .page.active {
+      display: block;
+      animation: fadeIn 0.25s ease;
+    }
 
-        .info-box small {
-            display: block;
-            color: #686e77;
-            margin-bottom: 5px;
-            font-size: 11px;
-        }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
 
-        .info-box strong {
-            font-size: 14px;
-        }
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 28px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
 
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 18px;
-        }
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
 
-        button {
-            border: 1px solid #30343b;
-            background: #181b20;
-            color: #ffffff;
-            padding: 11px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-        }
+    .page-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
 
-        button:hover {
-            background: #22262c;
-        }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-        .primary {
-            background: #ffffff;
-            color: #090a0c;
-            border-color: #ffffff;
-            font-weight: 700;
-        }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+      width: 100%;
+    }
 
-        .primary:hover {
-            background: #dddddd;
-        }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+      min-width: 0;
+    }
 
-        .preview {
-            min-height: 420px;
-        }
+    .card:hover { border-color: var(--border-hover); }
 
-        .phone {
-            width: 210px;
-            margin: 18px auto 0;
-            background: #08090b;
-            border: 7px solid #1c1f24;
-            border-radius: 25px;
-            padding: 16px 12px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);
-        }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.4), transparent);
+      opacity: 0.6;
+    }
 
-        .phone-title {
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-        }
+    .card-label {
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
 
-        .phone-status {
-            color: #f1c84b;
-            font-size: 10px;
-            margin-bottom: 10px;
-        }
+    .card h2, .card .card-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+      color: var(--text);
+      word-break: break-word;
+    }
 
-        .phone-banner {
-            height: 90px;
-            border-radius: 8px;
-            background: #181b20;
-            margin-bottom: 12px;
-        }
+    .card p, .card .card-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
 
-        .phone h3 {
-            font-size: 15px;
-            margin-bottom: 6px;
-        }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-12 { grid-column: span 12; }
 
-        .phone p {
-            color: #777d86;
-            font-size: 9px;
-            line-height: 1.5;
-        }
+    /* Status strip: force readable desktop cards */
+    .status-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 18px;
+      width: 100%;
+      margin-bottom: 0;
+    }
 
-        .phone-countdown {
-            font-size: 19px;
-            font-weight: 700;
-            margin: 12px 0;
-        }
+    .status-strip .card {
+      min-width: 180px;
+    }
 
-        @media (max-width: 900px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
+    .main-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.7fr);
+      gap: 18px;
+      width: 100%;
+    }
 
-            .sidebar {
-                display: none;
-            }
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      width: 100%;
+    }
 
-            .grid {
-                grid-template-columns: 1fr;
-            }
+    @media (max-width: 1100px) {
+      .status-strip {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+      }
+      .main-row {
+        grid-template-columns: 1fr;
+      }
+    }
 
-            .event-card {
-                grid-column: span 1;
-            }
+    @media (max-width: 640px) {
+      .status-strip {
+        grid-template-columns: 1fr;
+      }
+      .bottom-row {
+        grid-template-columns: 1fr;
+      }
+    }
 
-            .event-info {
-                grid-template-columns: 1fr;
-            }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      border: 1px solid;
+    }
 
-            .main {
-                padding: 20px;
-            }
-        }
-    </style>
+    .badge-active {
+      background: rgba(52, 211, 153, 0.12);
+      border-color: rgba(52, 211, 153, 0.35);
+      color: var(--green);
+    }
+
+    .badge-soon {
+      background: rgba(251, 191, 36, 0.12);
+      border-color: rgba(251, 191, 36, 0.35);
+      color: var(--yellow);
+    }
+
+    .badge-offline {
+      background: rgba(100, 116, 139, 0.12);
+      border-color: rgba(100, 116, 139, 0.3);
+      color: var(--text-dim);
+    }
+
+    .badge-scheduled {
+      background: rgba(34, 211, 238, 0.1);
+      border-color: rgba(34, 211, 238, 0.3);
+      color: var(--cyan);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text);
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--border-hover);
+      background: rgba(124, 58, 237, 0.12);
+      box-shadow: 0 0 14px rgba(124, 58, 237, 0.15);
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 0 18px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 0 24px rgba(124, 58, 237, 0.45);
+      background: var(--gradient);
+    }
+
+    .btn-cyan {
+      background: linear-gradient(135deg, #7c3aed 0%, #22d3ee 100%);
+      border-color: transparent;
+      color: #05050a;
+      font-weight: 700;
+    }
+
+    .btn-danger {
+      border-color: rgba(248, 113, 113, 0.35);
+      color: var(--red);
+    }
+
+    .btn-danger:hover {
+      background: rgba(248, 113, 113, 0.1);
+      border-color: rgba(248, 113, 113, 0.5);
+    }
+
+    .btn-ghost { background: transparent; }
+
+    .btn-sm {
+      padding: 7px 12px;
+      font-size: 10px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .event-banner {
+      height: 160px;
+      margin: 14px 0;
+      border-radius: 10px;
+      background:
+        linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(5, 5, 10, 0.9)),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(124, 58, 237, 0.03) 2px, rgba(124, 58, 237, 0.03) 4px);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .event-banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .event-info {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .info-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .info-box small {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .info-box strong {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .phone-frame {
+      width: 240px;
+      max-width: 100%;
+      margin: 0 auto;
+      background: #08080f;
+      border: 6px solid #1a1a28;
+      border-radius: 28px;
+      padding: 14px 12px 20px;
+      box-shadow:
+        0 0 0 1px rgba(124, 58, 237, 0.2),
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        inset 0 0 30px rgba(124, 58, 237, 0.03);
+      position: relative;
+    }
+
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 5px;
+      background: #1a1a28;
+      border-radius: 4px;
+    }
+
+    .phone-header {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-align: center;
+      margin: 10px 0 14px;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .phone-status {
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .phone-banner {
+      height: 88px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #12121c, #0b0b14);
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-size: 9px;
+      font-family: var(--font-display);
+      letter-spacing: 0.08em;
+    }
+
+    .phone-event-name {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .phone-countdown {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-align: center;
+      color: var(--cyan);
+      margin: 10px 0;
+      text-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+    }
+
+    .phone-desc {
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .phone-meta {
+      font-size: 9px;
+      color: var(--text-dim);
+      text-align: center;
+      font-family: var(--font-display);
+      letter-spacing: 0.06em;
+    }
+
+    .phone-tabs {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .phone-tab {
+      font-family: var(--font-display);
+      font-size: 8px;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+    }
+
+    .phone-tab.active { color: var(--purple-bright); }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    input, textarea, select {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 14px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      width: 100%;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--border-hover);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .list-title {
+      font-family: var(--font-display);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+
+    .event-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      transition: border-color 0.18s;
+    }
+
+    .event-row:hover { border-color: var(--border-hover); }
+
+    .event-row-name {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      margin-bottom: 3px;
+    }
+
+    .event-row-meta {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .event-row-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .announcement-preview {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      margin-top: 12px;
+    }
+
+    .announcement-preview .ann-label {
+      font-family: var(--font-display);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      margin-bottom: 8px;
+    }
+
+    .announcement-preview .ann-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .announcement-preview .ann-msg {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .terminal-line {
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .terminal-line .cmd { color: var(--cyan); }
+    .terminal-line .ok { color: var(--green); }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 5, 10, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 60px rgba(124, 58, 237, 0.2);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h3 {
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.08em;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .modal-body { padding: 22px; }
+
+    .modal-footer {
+      padding: 14px 22px 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+    }
+
+    .login-screen.hidden { display: none; }
+
+    .login-box {
+      width: 100%;
+      max-width: 440px;
+      padding: 40px 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 0 80px rgba(124, 58, 237, 0.15);
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--gradient);
+      border-radius: 16px 16px 0 0;
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .login-logo .logo-mark {
+      margin: 0 auto 14px;
+      width: 52px;
+      height: 52px;
+      font-size: 20px;
+    }
+
+    .login-logo h2 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .login-logo p {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: var(--font-display);
+      letter-spacing: 0.08em;
+    }
+
+    .login-error {
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      color: var(--red);
+      font-size: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-dim);
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    /* Desktop-first: keep 4 status cards side by side on wide screens */
+    @media (max-width: 1280px) {
+      .col-3 { grid-column: span 6; }
+      .col-5 { grid-column: span 12; }
+      .col-7 { grid-column: span 12; }
+    }
+
+    @media (max-width: 1100px) {
+      .col-3, .col-4 { grid-column: span 6; }
+      .col-5, .col-6, .col-7, .col-8 { grid-column: span 12; }
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main {
+        margin-left: 0;
+        width: 100%;
+        padding: 20px 16px 40px;
+      }
+      .col-3, .col-4, .col-5, .col-6, .col-7, .col-8 { grid-column: span 12; }
+      .form-grid { grid-template-columns: 1fr; }
+      .event-info { grid-template-columns: 1fr 1fr; }
+      .topbar-status { display: none; }
+    }
+
+    @media (max-width: 560px) {
+      .event-info { grid-template-columns: 1fr; }
+    }
+
+    .mt-8 { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-20 { margin-top: 20px; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-16 { margin-bottom: 16px; }
+    .text-cyan { color: var(--cyan); }
+    .text-green { color: var(--green); }
+    .text-yellow { color: var(--yellow); }
+    .text-dim { color: var(--text-dim); }
+    .hidden { display: none !important; }
+
+    .scanlines {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.03) 2px,
+        rgba(0, 0, 0, 0.03) 4px
+      );
+      z-index: 999;
+      opacity: 0.4;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
 
-<header class="topbar">
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+  <div class="scanlines"></div>
 
-    <div class="brand">
-        <div class="brand-mark">🏎️</div>
-        <span>BOVARY NOW</span>
-    </div>
-
-    <div class="admin-label">
-        ADMIN PANEL
-    </div>
-
-</header>
-
-
-<div class="layout">
-
-    <aside class="sidebar">
-
-        <div class="nav-title">
-            Management
+  <!-- LOGIN -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-box">
+      <div class="login-logo">
+        <div class="logo-mark">B</div>
+        <h2>BOVARY ADMIN CORE</h2>
+        <p>SYSTEM ACCESS · AUTHORIZED ONLY</p>
+      </div>
+      <div class="login-error" id="loginError">Access denied. Invalid credentials or not an administrator.</div>
+      <form id="loginForm" onsubmit="return handleLogin(event)">
+        <div style="border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:16px; background:rgba(124,58,237,0.06);">
+          <div style="font-family:var(--font-display); font-size:10px; letter-spacing:0.1em; color:var(--cyan); margin-bottom:12px;">
+            1 · SUPABASE CONNECTION
+          </div>
+          <div class="form-group mb-12">
+            <label>Project URL</label>
+            <input type="text" id="loginSupabaseUrl" placeholder="https://wmnzewxtameguxvvvojs.supabase.co" autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label>Anon / Public Key (not service_role)</label>
+            <input type="password" id="loginSupabaseAnon" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." autocomplete="off" />
+          </div>
+          <p class="text-dim" style="font-size:11px; margin-top:10px; line-height:1.45;">
+            Supabase Dashboard → Project Settings → API → Project URL + anon public key
+          </p>
         </div>
 
-        <a href="#" class="nav-item active">
-            Dashboard
-        </a>
-
-        <a href="#" class="nav-item">
-            Events
-        </a>
-
-        <a href="#" class="nav-item">
-            Announcements
-        </a>
-
-        <a href="#" class="nav-item">
-            Notifications
-        </a>
-
-
-        <div class="nav-title" style="margin-top: 30px;">
-            System
+        <div style="border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:16px;">
+          <div style="font-family:var(--font-display); font-size:10px; letter-spacing:0.1em; color:var(--purple-bright); margin-bottom:12px;">
+            2 · ADMIN ACCOUNT
+          </div>
+          <div class="form-group mb-12">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="seu-email-admin@gmail.com" required autocomplete="username" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="senha da conta Auth" required autocomplete="current-password" />
+          </div>
         </div>
 
-        <a href="#" class="nav-item">
-            Settings
-        </a>
+        <button type="submit" class="btn btn-primary" style="width:100%;">
+          AUTHENTICATE
+        </button>
+      </form>
+      <p class="text-dim" style="text-align:center; margin-top:20px; font-size:11px; font-family:var(--font-display); letter-spacing:0.08em;">
+        BOVA CORE · SECURE LINK
+      </p>
+    </div>
+  </div>
 
-        <a href="#" class="nav-item">
-            Logout
-        </a>
+  <!-- APP SHELL -->
+  <div id="appShell" class="hidden">
 
-    </aside>
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="logo-mark">B</div>
+        <div class="brand-text">
+          <span class="brand-title">BOVARY NOW</span>
+          <span class="brand-sub">Admin Core</span>
+        </div>
+      </div>
+      <div class="topbar-status">
+        <div class="status-item">
+          <span class="status-dot" id="sysDot"></span>
+          <span>SYSTEM ONLINE</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">SIGNAL:</span>
+          <span>STRONG</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">LINK:</span>
+          <span>SECURE</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">DB:</span>
+          <span id="dbStatus">STANDBY</span>
+        </div>
+      </div>
+    </header>
 
+    <div class="layout">
 
-    <main class="main">
+      <aside class="sidebar">
+        <div class="nav-section">Core</div>
+        <button class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+          <span class="nav-icon">◈</span> DASHBOARD
+        </button>
+        <button class="nav-item" data-page="events" onclick="navigate('events')">
+          <span class="nav-icon">▣</span> EVENTS
+        </button>
+        <button class="nav-item" data-page="announcements" onclick="navigate('announcements')">
+          <span class="nav-icon">◉</span> ANNOUNCEMENTS
+        </button>
 
-        <div class="page-header">
+        <div class="nav-section">System</div>
+        <button class="nav-item" data-page="notifications" onclick="navigate('notifications')">
+          <span class="nav-icon">◎</span> NOTIFICATIONS
+        </button>
+        <button class="nav-item" data-page="settings" onclick="navigate('settings')">
+          <span class="nav-icon">⚙</span> SETTINGS
+        </button>
 
+        <div class="sidebar-footer">
+          <div class="admin-info">
+            <strong id="adminEmailDisplay">admin</strong><br />
+            <span style="font-size:10px;">AUTHORIZED OPERATOR</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="handleLogout()">
+            LOGOUT
+          </button>
+        </div>
+      </aside>
+
+      <main class="main">
+
+        <!-- DASHBOARD -->
+        <section class="page active" id="page-dashboard">
+          <div class="page-header">
             <div>
-                <h1>Dashboard</h1>
-
-                <p>
-                    Manage Bovary Now sessions and events.
-                </p>
+              <h1>DASHBOARD</h1>
+              <p>Real-time session control · Bovary Club Society</p>
             </div>
-
-            <div class="status">
-                <span class="status-dot"></span>
-                System Online
+            <div class="header-actions">
+              <button class="btn btn-sm" onclick="refreshDashboard()">↻ REFRESH</button>
             </div>
+          </div>
 
-        </div>
-
-
-        <section class="grid">
+          <!-- Status strip: 4 equal cards on desktop -->
+          <div class="status-strip" style="margin-bottom:18px;">
+            <div class="card">
+              <div class="card-label">Current Status</div>
+              <div id="dashStatusBadge" class="badge badge-soon">🟡 STARTING SOON</div>
+              <p class="mt-12" id="dashStatusText">Next session is scheduled.</p>
+            </div>
 
             <div class="card">
-
-                <div class="card-label">
-                    Current Status
-                </div>
-
-                <h2>🟡 Starting Soon</h2>
-
-                <p>
-                    The next Bovary session is scheduled.
-                </p>
-
+              <div class="card-label">Next Event</div>
+              <h2 id="dashNextName">JDM Night</h2>
+              <p id="dashNextWhen">07 SEP 2026 · 21:00</p>
             </div>
-
 
             <div class="card">
-
-                <div class="card-label">
-                    Next Event
-                </div>
-
-                <h2>JDM Night 🇯🇵</h2>
-
-                <p>
-                    07/09/2026 • 21:00
-                </p>
-
+              <div class="card-label">Host</div>
+              <h2 id="dashHost">Bovary Staff</h2>
+              <p>Event host</p>
             </div>
-
 
             <div class="card">
+              <div class="card-label">Last Meet</div>
+              <h2 id="dashLastMeet">—</h2>
+              <p id="dashLastWhen">No completed session yet</p>
+            </div>
+          </div>
 
-                <div class="card-label">
-                    Host
+          <!-- Main event + live preview -->
+          <div class="main-row" style="margin-bottom:18px;">
+            <div class="card">
+              <div class="card-label">Current / Next Event</div>
+              <h2 id="dashEventName">JDM Night</h2>
+              <div class="event-banner" id="dashBanner">
+                <span>BANNER · EVENT IMAGE</span>
+              </div>
+              <div class="event-info">
+                <div class="info-box">
+                  <small>Date</small>
+                  <strong id="dashDate">07/09/2026</strong>
                 </div>
-
-                <h2>Bovary Staff</h2>
-
-                <p>
-                    Event host
-                </p>
-
+                <div class="info-box">
+                  <small>Time</small>
+                  <strong id="dashTime">21:00</strong>
+                </div>
+                <div class="info-box">
+                  <small>Timezone</small>
+                  <strong id="dashTz">America/Sao_Paulo</strong>
+                </div>
+              </div>
+              <p class="mt-12" id="dashDesc" style="font-size:13px; color:var(--text-muted);">
+                A night dedicated to Japanese cars, builds and street culture.
+              </p>
+              <div class="actions">
+                <button class="btn btn-primary" onclick="openEditEvent()">EDIT EVENT</button>
+                <button class="btn btn-cyan" onclick="startSession()">START SESSION</button>
+                <button class="btn btn-danger" onclick="endSession()">END SESSION</button>
+              </div>
             </div>
 
-
-            <div class="card event-card">
-
-                <div class="card-label">
-                    Current / Next Event
+            <div class="card">
+              <div class="card-label">Live Preview · Member App</div>
+              <div class="phone-frame">
+                <div class="phone-header">BOVARY NOW</div>
+                <div class="phone-status" id="previewStatus">🟡 STARTING SOON</div>
+                <div class="phone-banner" id="previewBanner">BANNER</div>
+                <div class="phone-event-name" id="previewName">JDM Night</div>
+                <div class="phone-countdown" id="previewCountdown">--:--:--</div>
+                <div class="phone-desc" id="previewDesc">A night dedicated to Japanese cars, builds and street culture.</div>
+                <div class="phone-meta" id="previewMeta">HOST · BOVARY STAFF</div>
+                <div class="phone-tabs">
+                  <span class="phone-tab active">NOW</span>
+                  <span class="phone-tab">EVENTS</span>
+                  <span class="phone-tab">SETTINGS</span>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <h2>JDM Night 🇯🇵</h2>
-
-                <div class="event-banner">
-                    Event Banner
-                </div>
-
-                <div class="event-info">
-
-                    <div class="info-box">
-                        <small>Date</small>
-                        <strong>07/09/2026</strong>
-                    </div>
-
-                    <div class="info-box">
-                        <small>Time</small>
-                        <strong>21:00</strong>
-                    </div>
-
-                    <div class="info-box">
-                        <small>Host</small>
-                        <strong>Bovary Staff</strong>
-                    </div>
-
-                </div>
-
-                <div class="actions">
-
-                    <button class="primary">
-                        Edit Event
-                    </button>
-
-                    <button>
-                        Start Session
-                    </button>
-
-                    <button>
-                        End Session
-                    </button>
-
-                </div>
-
+          <!-- Countdown + Announcement -->
+          <div class="bottom-row" style="margin-bottom:18px;">
+            <div class="card">
+              <div class="card-label">Countdown</div>
+              <div style="font-family:var(--font-display); font-size:36px; font-weight:700; letter-spacing:0.08em; color:var(--cyan); text-shadow:0 0 24px rgba(34,211,238,0.35);" id="dashCountdown">
+                --:--:--
+              </div>
+              <p class="mt-8 text-dim" style="font-size:12px;">Until scheduled start</p>
             </div>
 
-
-            <div class="card preview">
-
-                <div class="card-label">
-                    👁️ Live Preview
-                </div>
-
-                <div class="phone">
-
-                    <div class="phone-title">
-                        BOVARY NOW
-                    </div>
-
-                    <div class="phone-status">
-                        🟡 STARTING SOON
-                    </div>
-
-                    <div class="phone-banner"></div>
-
-                    <h3>
-                        JDM Night 🇯🇵
-                    </h3>
-
-                    <div class="phone-countdown">
-                        01:42:37
-                    </div>
-
-                    <p>
-                        A night dedicated to Japanese
-                        cars, builds and street culture.
-                    </p>
-
-                    <p style="margin-top: 10px;">
-                        Host: Bovary Staff
-                    </p>
-
-                </div>
-
+            <div class="card">
+              <div class="card-label">Daily Announcement</div>
+              <div id="dashAnnouncement">
+                <p class="text-dim" style="font-size:13px;">No announcement published.</p>
+              </div>
+              <div class="actions">
+                <button class="btn btn-sm" onclick="navigate('announcements')">MANAGE</button>
+              </div>
             </div>
+          </div>
 
+          <!-- System log full width -->
+          <div class="card">
+            <div class="card-label">System Log</div>
+            <div id="systemLog">
+              <div class="terminal-line"><span class="cmd">&gt;</span> BOVA CORE: <span class="ok">ARMED</span></div>
+              <div class="terminal-line"><span class="cmd">&gt;</span> ADMIN PANEL: <span class="ok">READY</span></div>
+              <div class="terminal-line"><span class="cmd">&gt;</span> SUPABASE LINK: STANDBY</div>
+              <div class="terminal-line"><span class="cmd">&gt;</span> SESSION MODULE: LOADED</div>
+            </div>
+          </div>
         </section>
 
-    </main>
+        <!-- EVENTS -->
+        <section class="page" id="page-events">
+          <div class="page-header">
+            <div>
+              <h1>EVENTS</h1>
+              <p>Create, edit and control Bovary sessions</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-primary" onclick="openCreateEvent()">+ CREATE EVENT</button>
+            </div>
+          </div>
 
-</div>
+          <div class="grid">
+            <div class="card col-12">
+              <div class="list-header">
+                <span class="list-title">UPCOMING / SCHEDULED</span>
+              </div>
+              <div id="upcomingList">
+                <div class="event-row">
+                  <div>
+                    <div class="event-row-name">JDM Night</div>
+                    <div class="event-row-meta">07 SEP 2026 · 21:00 · Bovary Staff · America/Sao_Paulo</div>
+                  </div>
+                  <span class="badge badge-scheduled">SCHEDULED</span>
+                  <div class="event-row-actions">
+                    <button class="btn btn-sm" onclick="openEditEvent()">EDIT</button>
+                    <button class="btn btn-sm btn-danger" onclick="confirmDeleteEvent()">DELETE</button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
+            <div class="card col-12">
+              <div class="list-header">
+                <span class="list-title">COMPLETED / LAST MEETS</span>
+              </div>
+              <div id="completedList">
+                <div class="empty-state">
+                  <p>No completed events yet.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ANNOUNCEMENTS -->
+        <section class="page" id="page-announcements">
+          <div class="page-header">
+            <div>
+              <h1>ANNOUNCEMENTS</h1>
+              <p>Single daily announcement shown in the member app</p>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card col-7">
+              <div class="card-label">Current Announcement</div>
+              <form id="announcementForm" onsubmit="return publishAnnouncement(event)">
+                <div class="form-group mb-16">
+                  <label>Title</label>
+                  <input type="text" id="annTitle" placeholder="Tonight's JDM Night" maxlength="80" />
+                </div>
+                <div class="form-group mb-16">
+                  <label>Message</label>
+                  <textarea id="annMessage" placeholder="Starts at 21:00. Be ready."></textarea>
+                </div>
+                <div class="actions">
+                  <button type="submit" class="btn btn-primary">PUBLISH</button>
+                  <button type="button" class="btn btn-danger" onclick="removeAnnouncement()">REMOVE</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="card col-5">
+              <div class="card-label">Preview</div>
+              <div class="announcement-preview">
+                <div class="ann-label">DAILY ANNOUNCEMENT</div>
+                <div class="ann-title" id="annPreviewTitle">—</div>
+                <div class="ann-msg" id="annPreviewMsg">No announcement published.</div>
+                <div class="mt-12 text-dim" style="font-size:11px; font-family:var(--font-display); letter-spacing:0.06em;">
+                  BOVARY STAFF
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- NOTIFICATIONS -->
+        <section class="page" id="page-notifications">
+          <div class="page-header">
+            <div>
+              <h1>NOTIFICATIONS</h1>
+              <p>Push notification configuration (Phase 7)</p>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card col-12">
+              <div class="card-label">Planned Triggers</div>
+              <div class="event-row">
+                <div>
+                  <div class="event-row-name">30 minutes before</div>
+                  <div class="event-row-meta">🏎️ BOVARY NOW — Event starts in 30 minutes</div>
+                </div>
+                <span class="badge badge-scheduled">PLANNED</span>
+              </div>
+              <div class="event-row">
+                <div>
+                  <div class="event-row-name">5 minutes before</div>
+                  <div class="event-row-meta">⚠️ BOVARY NOW — Event starts in 5 minutes</div>
+                </div>
+                <span class="badge badge-scheduled">PLANNED</span>
+              </div>
+              <div class="event-row">
+                <div>
+                  <div class="event-row-name">At start</div>
+                  <div class="event-row-meta">🟢 BOVARY NOW — SESSION ACTIVE · Event is now live</div>
+                </div>
+                <span class="badge badge-scheduled">PLANNED</span>
+              </div>
+              <p class="mt-16 text-dim" style="font-size:13px;">
+                Push system will be connected after Android app + FCM / Supabase edge functions.
+                This panel will allow enable/disable and custom messages.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="page" id="page-settings">
+          <div class="page-header">
+            <div>
+              <h1>SETTINGS</h1>
+              <p>Admin and system configuration</p>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card col-6">
+              <div class="card-label">Supabase Connection</div>
+              <div class="form-group mb-16">
+                <label>Project URL</label>
+                <input type="text" id="supabaseUrl" placeholder="https://xxxx.supabase.co" />
+              </div>
+              <div class="form-group mb-16">
+                <label>Anon / Public Key</label>
+                <input type="password" id="supabaseAnonKey" placeholder="eyJ..." />
+              </div>
+              <p class="text-dim" style="font-size:12px; margin-bottom:12px;">
+                Keys are stored only in this browser (localStorage). Never use the service_role key here.
+              </p>
+              <div class="actions">
+                <button class="btn btn-primary" onclick="saveSupabaseConfig()">SAVE CONFIG</button>
+                <button class="btn" onclick="testSupabaseConnection()">TEST CONNECTION</button>
+              </div>
+            </div>
+
+            <div class="card col-6">
+              <div class="card-label">System Info</div>
+              <div class="terminal-line"><span class="cmd">&gt;</span> PROJECT: BovaryNow</div>
+              <div class="terminal-line"><span class="cmd">&gt;</span> ORG: BovaryLikes</div>
+              <div class="terminal-line"><span class="cmd">&gt;</span> ENV: PRODUCTION</div>
+              <div class="terminal-line"><span class="cmd">&gt;</span> PANEL VERSION: 0.3.0-design</div>
+              <div class="terminal-line mt-12"><span class="cmd">&gt;</span> IDENTITY: BOVARY CLUB SOCIETY // ADMIN CORE</div>
+              <div class="terminal-line"><span class="cmd">&gt;</span> VISUAL: HUD / NEON / TERMINAL</div>
+            </div>
+
+            <div class="card col-12">
+              <div class="card-label">Security Rules</div>
+              <p style="font-size:13px; color:var(--text-muted); line-height:1.7;">
+                • Public users can only read permitted data (events, announcements).<br />
+                • Admin write operations require authenticated user + <code style="color:var(--cyan);">is_admin()</code>.<br />
+                • Service / secret keys must never appear in this panel or the Android app.<br />
+                • Use Supabase Auth + RLS for all protected actions.
+              </p>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL EVENT -->
+  <div class="modal-overlay" id="eventModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="eventModalTitle">CREATE EVENT</h3>
+        <button class="modal-close" onclick="closeEventModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="eventForm" onsubmit="return saveEvent(event)">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Name</label>
+              <input type="text" id="evName" required placeholder="JDM Night" />
+            </div>
+            <div class="form-group full">
+              <label>Description</label>
+              <textarea id="evDesc" placeholder="A night dedicated to Japanese cars..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" id="evDate" required />
+            </div>
+            <div class="form-group">
+              <label>Time</label>
+              <input type="time" id="evTime" required />
+            </div>
+            <div class="form-group">
+              <label>Host</label>
+              <input type="text" id="evHost" placeholder="Bovary Staff" />
+            </div>
+            <div class="form-group">
+              <label>Timezone</label>
+              <select id="evTz">
+                <option value="America/Sao_Paulo">America/Sao_Paulo (BRT)</option>
+                <option value="America/Argentina/Buenos_Aires">America/Argentina/Buenos_Aires (ART)</option>
+                <option value="Africa/Casablanca">Africa/Casablanca (WET)</option>
+                <option value="UTC">UTC</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select id="evStatus">
+                <option value="scheduled">scheduled</option>
+                <option value="starting_soon">starting_soon</option>
+                <option value="active">active</option>
+                <option value="ended">ended</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Banner URL (optional)</label>
+              <input type="url" id="evImage" placeholder="https://... or leave empty and upload file" />
+            </div>
+            <div class="form-group full">
+              <label>Upload Banner File</label>
+              <input type="file" id="evBannerFile" accept="image/jpeg,image/png,image/webp,image/gif" />
+              <p class="text-dim" style="font-size:11px;margin-top:6px;">JPG, PNG or WebP · stored in event-banners bucket</p>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeEventModal()">CANCEL</button>
+        <button class="btn btn-primary" onclick="document.getElementById('eventForm').requestSubmit()">SAVE EVENT</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================
+    // BOVARY NOW — ADMIN CORE
+    // Supabase-backed admin panel
+    // =========================================================
+
+    const SUPABASE_DEFAULT_URL = 'https://wmnzewxtameguxvvvojs.supabase.co';
+
+    let supabaseClient = null;
+
+    const state = {
+      authenticated: false,
+      user: null,
+      sessionStatus: 'offline',
+      currentEvent: null,
+      events: [],
+      lastMeet: null,
+      announcement: null,
+      editingEventId: null
+    };
+
+    // ---------- Config / client ----------
+    function getConfig() {
+      return {
+        url: (localStorage.getItem('bovary_supabase_url') || SUPABASE_DEFAULT_URL).trim(),
+        anon: (localStorage.getItem('bovary_supabase_anon') || '').trim()
+      };
+    }
+
+    function initSupabase() {
+      const { url, anon } = getConfig();
+      if (!url || !anon) {
+        supabaseClient = null;
+        setDbStatus('STANDBY');
+        return false;
+      }
+      try {
+        supabaseClient = window.supabase.createClient(url, anon);
+        setDbStatus('CONFIGURED');
+        return true;
+      } catch (err) {
+        console.error(err);
+        supabaseClient = null;
+        setDbStatus('ERROR');
+        return false;
+      }
+    }
+
+    function setDbStatus(text) {
+      const el = document.getElementById('dbStatus');
+      if (el) el.textContent = text;
+    }
+
+    // ---------- Navigation ----------
+    function navigate(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const el = document.getElementById('page-' + page);
+      if (el) el.classList.add('active');
+      const nav = document.querySelector('.nav-item[data-page="' + page + '"]');
+      if (nav) nav.classList.add('active');
+      if (page === 'events') renderEventLists();
+      if (page === 'announcements') fillAnnouncementForm();
+    }
+
+    // ---------- Auth ----------
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+      const errBox = document.getElementById('loginError');
+      errBox.style.display = 'none';
+
+      // Optional: save connection from login panel
+      const loginUrl = document.getElementById('loginSupabaseUrl');
+      const loginAnon = document.getElementById('loginSupabaseAnon');
+      if (loginUrl && loginUrl.value.trim()) {
+        localStorage.setItem('bovary_supabase_url', loginUrl.value.trim());
+      }
+      if (loginAnon && loginAnon.value.trim()) {
+        localStorage.setItem('bovary_supabase_anon', loginAnon.value.trim());
+      }
+
+      if (!initSupabase()) {
+        errBox.textContent = 'Preencha Project URL + Anon Key (bloco 1) e o email/senha do admin (bloco 2).';
+        errBox.style.display = 'block';
+        return false;
+      }
+
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password: pass
+        });
+        if (error) throw error;
+
+        // Verify admin
+        const { data: adminRow, error: adminErr } = await supabaseClient
+          .from('admins')
+          .select('user_id')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        if (adminErr) throw adminErr;
+        if (!adminRow) {
+          await supabaseClient.auth.signOut();
+          throw new Error('Not an administrator');
+        }
+
+        state.authenticated = true;
+        state.user = data.user;
+        enterApp(email);
+        logLine('AUTH: OPERATOR VERIFIED');
+        await loadAllData();
+      } catch (err) {
+        console.error(err);
+        errBox.textContent = err.message || 'Access denied.';
+        errBox.style.display = 'block';
+      }
+      return false;
+    }
+
+    function enterApp(email) {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('appShell').classList.remove('hidden');
+      document.getElementById('adminEmailDisplay').textContent = email || state.user?.email || 'admin';
+      startCountdownTicker();
+    }
+
+    async function handleLogout() {
+      if (supabaseClient) {
+        try { await supabaseClient.auth.signOut(); } catch (_) {}
+      }
+      state.authenticated = false;
+      state.user = null;
+      document.getElementById('appShell').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('loginPassword').value = '';
+    }
+
+    async function restoreSession() {
+      if (!initSupabase()) return;
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) return;
+
+      const { data: adminRow } = await supabaseClient
+        .from('admins')
+        .select('user_id')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (!adminRow) {
+        await supabaseClient.auth.signOut();
+        return;
+      }
+
+      state.authenticated = true;
+      state.user = session.user;
+      enterApp(session.user.email);
+      logLine('AUTH: SESSION RESTORED');
+      await loadAllData();
+    }
+
+    // ---------- Data loading ----------
+    async function loadAllData() {
+      setDbStatus('CONNECTED');
+      await Promise.all([loadEvents(), loadAnnouncement()]);
+      refreshDashboard();
+      renderEventLists();
+      logLine('DATA: SYNCED FROM SUPABASE');
+    }
+
+    async function loadEvents() {
+      if (!supabaseClient) return;
+      const { data, error } = await supabaseClient
+        .from('events')
+        .select('*')
+        .order('event_date', { ascending: true })
+        .order('event_time', { ascending: true });
+
+      if (error) {
+        console.error(error);
+        logLine('ERROR: EVENTS ' + error.message);
+        return;
+      }
+
+      state.events = data || [];
+
+      // Current = active or starting_soon or next scheduled
+      const active = state.events.find(e => e.status === 'active');
+      const soon = state.events.find(e => e.status === 'starting_soon');
+      const scheduled = state.events.filter(e => e.status === 'scheduled' || e.status === 'starting_soon');
+      const ended = state.events.filter(e => e.status === 'ended');
+
+      state.currentEvent = active || soon || scheduled[0] || null;
+      state.lastMeet = ended.length
+        ? ended.sort((a, b) => String(b.event_date + b.event_time).localeCompare(String(a.event_date + a.event_time)))[0]
+        : null;
+
+      // Prefer explicit status from DB; auto logic can refine scheduled events
+      applyAutoSessionLogic();
+    }
+
+    function eventStartDate(ev) {
+      if (!ev) return null;
+      const d = String(ev.event_date).slice(0, 10);
+      const t = String(ev.event_time || '00:00').slice(0, 5);
+      const dp = d.split('-').map(Number);
+      const tp = t.split(':').map(Number);
+      return new Date(dp[0], dp[1] - 1, dp[2], tp[0], tp[1], 0);
+    }
+
+    // Automatic status for display + optional DB sync of starting_soon
+    function applyAutoSessionLogic() {
+      const now = new Date();
+      const SOON_MS = 60 * 60 * 1000; // 60 min window = starting soon
+
+      // Ended events
+      const ended = state.events.filter(e => e.status === 'ended');
+      state.lastMeet = ended.length
+        ? ended.slice().sort((a, b) => {
+            const da = eventStartDate(a)?.getTime() || 0;
+            const db = eventStartDate(b)?.getTime() || 0;
+            return db - da;
+          })[0]
+        : null;
+
+      // Explicit active wins
+      const active = state.events.find(e => e.status === 'active');
+      if (active) {
+        state.currentEvent = active;
+        state.sessionStatus = 'active';
+        return;
+      }
+
+      // Candidates: scheduled / starting_soon, ordered by start time
+      const candidates = state.events
+        .filter(e => e.status === 'scheduled' || e.status === 'starting_soon')
+        .slice()
+        .sort((a, b) => (eventStartDate(a)?.getTime() || 0) - (eventStartDate(b)?.getTime() || 0));
+
+      if (!candidates.length) {
+        state.currentEvent = null;
+        state.sessionStatus = 'offline';
+        return;
+      }
+
+      // Pick next upcoming or most recent past scheduled (still not ended)
+      let chosen = null;
+      for (const ev of candidates) {
+        const start = eventStartDate(ev);
+        if (!start) continue;
+        // Keep as current if within soon window before, or up to 4h after start without being ended
+        if (start.getTime() - now.getTime() <= SOON_MS && now.getTime() - start.getTime() < 4 * 60 * 60 * 1000) {
+          chosen = ev;
+          break;
+        }
+      }
+      if (!chosen) {
+        // next future event
+        chosen = candidates.find(ev => {
+          const s = eventStartDate(ev);
+          return s && s.getTime() > now.getTime();
+        }) || candidates[0];
+      }
+
+      state.currentEvent = chosen;
+      const start = eventStartDate(chosen);
+      if (!start) {
+        state.sessionStatus = 'starting_soon';
+        return;
+      }
+      const diff = start.getTime() - now.getTime();
+      if (diff <= 0 && chosen.status !== 'ended') {
+        // Past start but not marked active — show starting_soon until staff hits Start
+        // (manual Start Session remains the authority for "live")
+        state.sessionStatus = diff > -4 * 60 * 60 * 1000 ? 'starting_soon' : 'offline';
+      } else if (diff <= SOON_MS) {
+        state.sessionStatus = 'starting_soon';
+      } else {
+        state.sessionStatus = 'starting_soon';
+      }
+    }
+
+    async function loadAnnouncement() {
+      if (!supabaseClient) return;
+      const { data, error } = await supabaseClient
+        .from('announcements')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        // Policies for announcements may still need to be added in Supabase
+        console.warn('announcements', error);
+        logLine('WARN: ANNOUNCEMENTS ' + error.message);
+        state.announcement = null;
+        return;
+      }
+      state.announcement = (data && data[0]) || null;
+    }
+
+    // ---------- Dashboard UI ----------
+    function formatDateDisplay(isoDate) {
+      if (!isoDate) return '—';
+      const parts = String(isoDate).slice(0, 10).split('-');
+      const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      return parts[2] + ' ' + months[parseInt(parts[1], 10) - 1] + ' ' + parts[0];
+    }
+
+    function formatTime(t) {
+      if (!t) return '—';
+      return String(t).slice(0, 5);
+    }
+
+    function refreshDashboard() {
+      const ev = state.currentEvent;
+
+      document.getElementById('dashNextName').textContent = ev ? ev.name : '—';
+      document.getElementById('dashNextWhen').textContent = ev
+        ? formatDateDisplay(ev.event_date) + ' · ' + formatTime(ev.event_time)
+        : '—';
+      document.getElementById('dashHost').textContent = (ev && ev.host) || '—';
+      document.getElementById('dashEventName').textContent = ev ? ev.name : 'No event';
+      document.getElementById('dashDate').textContent = ev
+        ? String(ev.event_date).slice(0, 10).split('-').reverse().join('/')
+        : '—';
+      document.getElementById('dashTime').textContent = ev ? formatTime(ev.event_time) : '—';
+      document.getElementById('dashTz').textContent = (ev && ev.timezone) || '—';
+      document.getElementById('dashDesc').textContent = (ev && ev.description) || '';
+
+      // Banner
+      const banner = document.getElementById('dashBanner');
+      const previewBanner = document.getElementById('previewBanner');
+      if (ev && ev.image_url) {
+        banner.innerHTML = '<img src="' + escapeAttr(ev.image_url) + '" alt="banner" style="width:100%;height:100%;object-fit:cover;" />';
+        previewBanner.innerHTML = '<img src="' + escapeAttr(ev.image_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />';
+      } else {
+        banner.innerHTML = '<span>BANNER · EVENT IMAGE</span>';
+        previewBanner.textContent = 'BANNER';
+      }
+
+      document.getElementById('previewName').textContent = ev ? ev.name : '—';
+      document.getElementById('previewDesc').textContent = (ev && ev.description) || '';
+      document.getElementById('previewMeta').textContent = 'HOST · ' + ((ev && ev.host) || '—').toUpperCase();
+
+      updateStatusUI(state.sessionStatus);
+
+      if (state.lastMeet) {
+        document.getElementById('dashLastMeet').textContent = state.lastMeet.name;
+        document.getElementById('dashLastWhen').textContent =
+          formatDateDisplay(state.lastMeet.event_date) + ' · ' + formatTime(state.lastMeet.event_time);
+      } else {
+        document.getElementById('dashLastMeet').textContent = '—';
+        document.getElementById('dashLastWhen').textContent = 'No completed session yet';
+      }
+
+      if (state.announcement) {
+        document.getElementById('dashAnnouncement').innerHTML =
+          '<div style="font-family:var(--font-display); font-size:13px; font-weight:600; margin-bottom:4px;">' +
+          escapeHtml(state.announcement.title || '') + '</div>' +
+          '<p style="font-size:13px; color:var(--text-muted);">' +
+          escapeHtml(state.announcement.message || '') + '</p>';
+      } else {
+        document.getElementById('dashAnnouncement').innerHTML =
+          '<p class="text-dim" style="font-size:13px;">No announcement published.</p>';
+      }
+
+      updateCountdown();
+    }
+
+    function updateStatusUI(status) {
+      const badge = document.getElementById('dashStatusBadge');
+      const text = document.getElementById('dashStatusText');
+      const prev = document.getElementById('previewStatus');
+      badge.className = 'badge';
+      if (status === 'active') {
+        badge.classList.add('badge-active');
+        badge.textContent = '🟢 SESSION ACTIVE';
+        text.textContent = 'Session is live now.';
+        prev.textContent = '🟢 SESSION ACTIVE';
+        prev.style.color = 'var(--green)';
+      } else if (status === 'starting_soon') {
+        badge.classList.add('badge-soon');
+        badge.textContent = '🟡 STARTING SOON';
+        text.textContent = 'The next Bovary session is scheduled.';
+        prev.textContent = '🟡 STARTING SOON';
+        prev.style.color = 'var(--yellow)';
+      } else {
+        badge.classList.add('badge-offline');
+        badge.textContent = '⚫ OFFLINE';
+        text.textContent = 'No active session.';
+        prev.textContent = '⚫ NO ACTIVE SESSION';
+        prev.style.color = 'var(--text-dim)';
+      }
+    }
+
+    async function startSession() {
+      if (!state.currentEvent || !supabaseClient) {
+        alert('No event selected or not connected.');
+        return;
+      }
+      const id = state.currentEvent.id;
+      const { error } = await supabaseClient
+        .from('events')
+        .update({ status: 'active', updated_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) {
+        alert('Failed to start session: ' + error.message);
+        return;
+      }
+      state.sessionStatus = 'active';
+      state.currentEvent.status = 'active';
+      updateStatusUI('active');
+      logLine('SESSION: STARTED · ' + state.currentEvent.name);
+      await loadEvents();
+      refreshDashboard();
+      renderEventLists();
+    }
+
+    async function endSession() {
+      if (!state.currentEvent || !supabaseClient) {
+        alert('No event selected or not connected.');
+        return;
+      }
+      const id = state.currentEvent.id;
+      const { error } = await supabaseClient
+        .from('events')
+        .update({ status: 'ended', updated_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) {
+        alert('Failed to end session: ' + error.message);
+        return;
+      }
+      logLine('SESSION: ENDED · LAST MEET UPDATED');
+      await loadEvents();
+      refreshDashboard();
+      renderEventLists();
+    }
+
+    // ---------- Countdown ----------
+    let countdownTimer = null;
+
+    function getEventDateTime() {
+      const ev = state.currentEvent;
+      if (!ev) return null;
+      const d = String(ev.event_date).slice(0, 10);
+      const t = formatTime(ev.event_time);
+      const parts = d.split('-').map(Number);
+      const tp = t.split(':').map(Number);
+      // Approximate wall-clock in local browser; Phase 5 can use full TZ math
+      return new Date(parts[0], parts[1] - 1, parts[2], tp[0], tp[1], 0);
+    }
+
+    function updateCountdown() {
+      const target = getEventDateTime();
+      const el = document.getElementById('dashCountdown');
+      const prev = document.getElementById('previewCountdown');
+      if (!el || !prev) return;
+      if (!target || state.sessionStatus === 'active') {
+        const label = state.sessionStatus === 'active' ? 'LIVE' : '--:--:--';
+        el.textContent = label;
+        prev.textContent = label;
+        return;
+      }
+      const now = new Date();
+      let diff = Math.floor((target - now) / 1000);
+      if (diff <= 0) {
+        el.textContent = '00:00:00';
+        prev.textContent = '00:00:00';
+        return;
+      }
+      const h = Math.floor(diff / 3600);
+      const m = Math.floor((diff % 3600) / 60);
+      const s = diff % 60;
+      const str = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      el.textContent = str;
+      prev.textContent = str;
+    }
+
+    function startCountdownTicker() {
+      if (countdownTimer) clearInterval(countdownTimer);
+      updateCountdown();
+      countdownTimer = setInterval(updateCountdown, 1000);
+    }
+
+    // ---------- Events CRUD ----------
+    function openCreateEvent() {
+      state.editingEventId = null;
+      document.getElementById('eventModalTitle').textContent = 'CREATE EVENT';
+      document.getElementById('evName').value = '';
+      document.getElementById('evDesc').value = '';
+      document.getElementById('evDate').value = '';
+      document.getElementById('evTime').value = '';
+      document.getElementById('evHost').value = 'Bovary Staff';
+      document.getElementById('evTz').value = 'America/Sao_Paulo';
+      document.getElementById('evStatus').value = 'scheduled';
+      document.getElementById('evImage').value = '';
+      const bf = document.getElementById('evBannerFile');
+      if (bf) bf.value = '';
+      document.getElementById('eventModal').classList.add('open');
+    }
+
+    function openEditEvent(id) {
+      const ev = id
+        ? state.events.find(e => e.id === id)
+        : state.currentEvent;
+      if (!ev) return openCreateEvent();
+      state.editingEventId = ev.id;
+      document.getElementById('eventModalTitle').textContent = 'EDIT EVENT';
+      document.getElementById('evName').value = ev.name || '';
+      document.getElementById('evDesc').value = ev.description || '';
+      document.getElementById('evDate').value = String(ev.event_date).slice(0, 10);
+      document.getElementById('evTime').value = formatTime(ev.event_time);
+      document.getElementById('evHost').value = ev.host || '';
+      document.getElementById('evTz').value = ev.timezone || 'America/Sao_Paulo';
+      document.getElementById('evStatus').value = ev.status || 'scheduled';
+      document.getElementById('evImage').value = ev.image_url || '';
+      const bf2 = document.getElementById('evBannerFile');
+      if (bf2) bf2.value = '';
+      document.getElementById('eventModal').classList.add('open');
+    }
+
+    function closeEventModal() {
+      document.getElementById('eventModal').classList.remove('open');
+    }
+
+    async function uploadBannerIfNeeded() {
+      const fileInput = document.getElementById('evBannerFile');
+      const file = fileInput && fileInput.files && fileInput.files[0];
+      if (!file) return null;
+      if (!supabaseClient) throw new Error('Not connected');
+
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const safeName = (document.getElementById('evName').value || 'event')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '') || 'event';
+      const pathName = safeName + '-' + Date.now() + '.' + ext;
+
+      const { error: upErr } = await supabaseClient.storage
+        .from('event-banners')
+        .upload(pathName, file, { cacheControl: '3600', upsert: true, contentType: file.type });
+
+      if (upErr) throw upErr;
+
+      const { data: pub } = supabaseClient.storage.from('event-banners').getPublicUrl(pathName);
+      return pub && pub.publicUrl ? pub.publicUrl : null;
+    }
+
+        async function saveEvent(e) {
+      e.preventDefault();
+      if (!supabaseClient) {
+        alert('Not connected to Supabase.');
+        return false;
+      }
+
+      let imageUrl = document.getElementById('evImage').value.trim() || null;
+      try {
+        const uploaded = await uploadBannerIfNeeded();
+        if (uploaded) imageUrl = uploaded;
+      } catch (upErr) {
+        alert('Banner upload failed: ' + (upErr.message || upErr));
+        return false;
+      }
+
+      const payload = {
+        name: document.getElementById('evName').value.trim(),
+        description: document.getElementById('evDesc').value.trim(),
+        event_date: document.getElementById('evDate').value,
+        event_time: document.getElementById('evTime').value,
+        host: document.getElementById('evHost').value.trim(),
+        timezone: document.getElementById('evTz').value,
+        status: document.getElementById('evStatus').value,
+        image_url: imageUrl,
+        updated_at: new Date().toISOString()
+      };
+
+      let error;
+      if (state.editingEventId) {
+        ({ error } = await supabaseClient
+          .from('events')
+          .update(payload)
+          .eq('id', state.editingEventId));
+      } else {
+        ({ error } = await supabaseClient
+          .from('events')
+          .insert([payload]));
+      }
+
+      if (error) {
+        alert('Save failed: ' + error.message);
+        return false;
+      }
+
+      const fileInput = document.getElementById('evBannerFile');
+      if (fileInput) fileInput.value = '';
+
+      closeEventModal();
+      logLine('EVENT SAVED: ' + payload.name);
+      await loadEvents();
+      refreshDashboard();
+      renderEventLists();
+      return false;
+    }
+
+    async function confirmDeleteEvent(id) {
+      const targetId = id || (state.currentEvent && state.currentEvent.id);
+      if (!targetId) return;
+      if (!confirm('Delete this event permanently?')) return;
+      if (!supabaseClient) return;
+
+      const { error } = await supabaseClient.from('events').delete().eq('id', targetId);
+      if (error) {
+        alert('Delete failed: ' + error.message);
+        return;
+      }
+      logLine('EVENT DELETED');
+      await loadEvents();
+      refreshDashboard();
+      renderEventLists();
+    }
+
+    function renderEventLists() {
+      const upcoming = state.events.filter(e => e.status !== 'ended');
+      const completed = state.events.filter(e => e.status === 'ended');
+
+      const upEl = document.getElementById('upcomingList');
+      const coEl = document.getElementById('completedList');
+      if (!upEl || !coEl) return;
+
+      if (!upcoming.length) {
+        upEl.innerHTML = '<div class="empty-state"><p>No upcoming events.</p></div>';
+      } else {
+        upEl.innerHTML = upcoming.map(ev => `
+          <div class="event-row">
+            <div>
+              <div class="event-row-name">${escapeHtml(ev.name)}</div>
+              <div class="event-row-meta">${formatDateDisplay(ev.event_date)} · ${formatTime(ev.event_time)} · ${escapeHtml(ev.host || '')} · ${escapeHtml(ev.timezone || '')}</div>
+            </div>
+            <span class="badge badge-scheduled">${escapeHtml((ev.status || 'scheduled').toUpperCase())}</span>
+            <div class="event-row-actions">
+              <button class="btn btn-sm" onclick="openEditEvent(${ev.id})">EDIT</button>
+              <button class="btn btn-sm btn-danger" onclick="confirmDeleteEvent(${ev.id})">DELETE</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (!completed.length) {
+        coEl.innerHTML = '<div class="empty-state"><p>No completed events yet.</p></div>';
+      } else {
+        coEl.innerHTML = completed.map(ev => `
+          <div class="event-row">
+            <div>
+              <div class="event-row-name">${escapeHtml(ev.name)}</div>
+              <div class="event-row-meta">${formatDateDisplay(ev.event_date)} · ${formatTime(ev.event_time)} · ${escapeHtml(ev.host || '')}</div>
+            </div>
+            <span class="badge badge-offline">ENDED</span>
+            <div class="event-row-actions">
+              <button class="btn btn-sm" onclick="openEditEvent(${ev.id})">VIEW</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // ---------- Announcements ----------
+    function fillAnnouncementForm() {
+      const a = state.announcement;
+      document.getElementById('annTitle').value = (a && a.title) || '';
+      document.getElementById('annMessage').value = (a && a.message) || '';
+      document.getElementById('annPreviewTitle').textContent = (a && a.title) || '—';
+      document.getElementById('annPreviewMsg').textContent = (a && a.message) || 'No announcement published.';
+    }
+
+    async function publishAnnouncement(e) {
+      e.preventDefault();
+      if (!supabaseClient) {
+        alert('Not connected to Supabase.');
+        return false;
+      }
+      const title = document.getElementById('annTitle').value.trim();
+      const message = document.getElementById('annMessage').value.trim();
+      if (!title && !message) return false;
+
+      // Keep a single "current" announcement: delete old rows then insert
+      await supabaseClient.from('announcements').delete().neq('id', 0);
+      const { error } = await supabaseClient
+        .from('announcements')
+        .insert([{ title, message }]);
+
+      if (error) {
+        alert('Publish failed: ' + error.message + '\n\nIf this is a policy error, add admin INSERT/DELETE policies on public.announcements in Supabase.');
+        return false;
+      }
+
+      state.announcement = { title, message };
+      document.getElementById('annPreviewTitle').textContent = title || '—';
+      document.getElementById('annPreviewMsg').textContent = message || 'No announcement published.';
+      refreshDashboard();
+      logLine('ANNOUNCEMENT PUBLISHED');
+      return false;
+    }
+
+    async function removeAnnouncement() {
+      if (!supabaseClient) return;
+      const { error } = await supabaseClient.from('announcements').delete().neq('id', 0);
+      if (error) {
+        alert('Remove failed: ' + error.message);
+        return;
+      }
+      state.announcement = null;
+      document.getElementById('annTitle').value = '';
+      document.getElementById('annMessage').value = '';
+      document.getElementById('annPreviewTitle').textContent = '—';
+      document.getElementById('annPreviewMsg').textContent = 'No announcement published.';
+      document.getElementById('dashAnnouncement').innerHTML =
+        '<p class="text-dim" style="font-size:13px;">No announcement published.</p>';
+      logLine('ANNOUNCEMENT REMOVED');
+    }
+
+    // Live preview typing
+    document.addEventListener('input', function (ev) {
+      if (ev.target && ev.target.id === 'annTitle') {
+        document.getElementById('annPreviewTitle').textContent = ev.target.value || '—';
+      }
+      if (ev.target && ev.target.id === 'annMessage') {
+        document.getElementById('annPreviewMsg').textContent = ev.target.value || 'No announcement published.';
+      }
+    });
+
+    // ---------- Settings ----------
+    function saveSupabaseConfig() {
+      const url = document.getElementById('supabaseUrl').value.trim() || SUPABASE_DEFAULT_URL;
+      const key = document.getElementById('supabaseAnonKey').value.trim();
+      localStorage.setItem('bovary_supabase_url', url);
+      localStorage.setItem('bovary_supabase_anon', key);
+      initSupabase();
+      logLine('CONFIG: SUPABASE KEYS STORED LOCALLY');
+      alert('Config saved in this browser.\nURL: ' + url + '\n\nUse your real admin account to login.');
+    }
+
+    async function testSupabaseConnection() {
+      if (!initSupabase()) {
+        alert('Enter Project URL and Anon Key, then Save Config.');
+        return;
+      }
+      try {
+        const { error } = await supabaseClient.from('events').select('id').limit(1);
+        if (error) throw error;
+        setDbStatus('CONNECTED');
+        logLine('TEST: CONNECTION OK');
+        alert('Connection OK — can read events.');
+      } catch (err) {
+        setDbStatus('ERROR');
+        logLine('TEST: FAILED ' + err.message);
+        alert('Connection test failed: ' + err.message);
+      }
+    }
+
+    function loadSavedConfig() {
+      const url = localStorage.getItem('bovary_supabase_url') || SUPABASE_DEFAULT_URL;
+      const key = localStorage.getItem('bovary_supabase_anon') || '';
+      const urlEl = document.getElementById('supabaseUrl');
+      const keyEl = document.getElementById('supabaseAnonKey');
+      if (urlEl) urlEl.value = url;
+      if (keyEl) keyEl.value = key;
+      const loginUrl = document.getElementById('loginSupabaseUrl');
+      const loginAnon = document.getElementById('loginSupabaseAnon');
+      if (loginUrl) loginUrl.value = url;
+      if (loginAnon) loginAnon.value = key;
+      if (key) setDbStatus('CONFIGURED');
+    }
+
+    // ---------- Helpers ----------
+    function logLine(msg) {
+      const log = document.getElementById('systemLog');
+      if (!log) return;
+      const line = document.createElement('div');
+      line.className = 'terminal-line';
+      line.innerHTML = '<span class="cmd">&gt;</span> ' + escapeHtml(msg);
+      log.appendChild(line);
+      while (log.children.length > 14) log.removeChild(log.firstChild);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/'/g, '&#39;');
+    }
+
+    // ---------- Init ----------
+    let dataRefreshTimer = null;
+
+    function startDataRefresh() {
+      if (dataRefreshTimer) clearInterval(dataRefreshTimer);
+      dataRefreshTimer = setInterval(async () => {
+        if (!state.authenticated || !supabaseClient) return;
+        try {
+          await loadEvents();
+          await loadAnnouncement();
+          refreshDashboard();
+          renderEventLists();
+        } catch (e) {
+          console.warn('refresh', e);
+        }
+      }, 60000);
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+      loadSavedConfig();
+      initSupabase();
+      await restoreSession();
+      startDataRefresh();
+    });
+
+    document.getElementById('eventModal').addEventListener('click', function (e) {
+      if (e.target === this) closeEventModal();
+    });
+  </script>
 </body>
 </html>
