@@ -1139,6 +1139,14 @@
           <span class="nav-icon">◉</span> ANNOUNCEMENTS
         </button>
 
+        <div class="nav-section">Fenrir Yakuza</div>
+        <button class="nav-item" data-page="fenrir-events" onclick="navigate('fenrir-events')">
+          <span class="nav-icon">⚔</span> FENRIR EVENTS
+        </button>
+        <button class="nav-item" data-page="fenrir-announcements" onclick="navigate('fenrir-announcements')">
+          <span class="nav-icon">☰</span> FENRIR ANNOUNCEMENTS
+        </button>
+
         <div class="nav-section">System</div>
         <button class="nav-item" data-page="notifications" onclick="navigate('notifications')">
           <span class="nav-icon">◎</span> NOTIFICATIONS
@@ -1328,6 +1336,30 @@
           </div>
         </section>
 
+
+        <!-- FENRIR EVENTS (FiveM) -->
+        <section class="page" id="page-fenrir-events">
+          <div class="page-header">
+            <div>
+              <h1>FENRIR EVENTS</h1>
+              <p>Create, edit and control Fenrir Yakuza FiveM sessions</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-primary" onclick="openCreateFenrirEvent()">+ CREATE FENRIR EVENT</button>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="card col-12">
+              <div class="list-header"><span class="list-title">UPCOMING / SCHEDULED</span></div>
+              <div id="fenrirUpcomingList"><div class="empty-state"><p>No Fenrir events yet.</p></div></div>
+            </div>
+            <div class="card col-12">
+              <div class="list-header"><span class="list-title">COMPLETED / LAST MEETS</span></div>
+              <div id="fenrirCompletedList"><div class="empty-state"><p>No completed Fenrir sessions yet.</p></div></div>
+            </div>
+          </div>
+        </section>
+
         <!-- ANNOUNCEMENTS -->
         <section class="page" id="page-announcements">
           <div class="page-header">
@@ -1365,6 +1397,45 @@
                 <div class="mt-12 text-dim" style="font-size:11px; font-family:var(--font-display); letter-spacing:0.06em;">
                   BOVARY STAFF
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- FENRIR ANNOUNCEMENTS (FiveM) -->
+        <section class="page" id="page-fenrir-announcements">
+          <div class="page-header">
+            <div>
+              <h1>FENRIR ANNOUNCEMENTS</h1>
+              <p>Announcement shown in the FiveM tab of the member app</p>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="card col-7">
+              <div class="card-label">Current Fenrir Announcement</div>
+              <form id="fenrirAnnouncementForm" onsubmit="return publishFenrirAnnouncement(event)">
+                <div class="form-group mb-16">
+                  <label>Title</label>
+                  <input type="text" id="fenrirAnnTitle" placeholder="Fenrir meet tonight" maxlength="80" />
+                </div>
+                <div class="form-group mb-16">
+                  <label>Message</label>
+                  <textarea id="fenrirAnnMessage" placeholder="Starts at 21:00. Be ready."></textarea>
+                </div>
+                <div class="actions">
+                  <button type="submit" class="btn btn-primary">PUBLISH</button>
+                  <button type="button" class="btn btn-danger" onclick="removeFenrirAnnouncement()">REMOVE</button>
+                </div>
+              </form>
+            </div>
+            <div class="card col-5">
+              <div class="card-label">Preview</div>
+              <div class="announcement-preview">
+                <div class="ann-label">FENRIR ANNOUNCEMENT</div>
+                <div class="ann-title" id="fenrirAnnPreviewTitle">—</div>
+                <div class="ann-msg" id="fenrirAnnPreviewMsg">No Fenrir announcement published.</div>
+                <div class="mt-12 text-dim" style="font-size:11px; font-family:var(--font-display); letter-spacing:0.06em;">FENRIR YAKUZA</div>
               </div>
             </div>
           </div>
@@ -1551,7 +1622,13 @@
       events: [],
       lastMeet: null,
       announcement: null,
-      editingEventId: null
+      editingEventId: null,
+      fenrirEvents: [],
+      fenrirCurrentEvent: null,
+      fenrirLastMeet: null,
+      fenrirAnnouncement: null,
+      editingFenrirEventId: null,
+      eventTargetTable: 'events'
     };
 
     // ---------- Config / client ----------
@@ -1596,6 +1673,8 @@
       if (nav) nav.classList.add('active');
       if (page === 'events') renderEventLists();
       if (page === 'announcements') fillAnnouncementForm();
+      if (page === 'fenrir-events') renderFenrirEventLists();
+      if (page === 'fenrir-announcements') fillFenrirAnnouncementForm();
     }
 
     // ---------- Auth ----------
@@ -1699,10 +1778,16 @@
     // ---------- Data loading ----------
     async function loadAllData() {
       setDbStatus('CONNECTED');
-      await Promise.all([loadEvents(), loadAnnouncement()]);
+      await Promise.all([
+        loadEvents(),
+        loadAnnouncement(),
+        loadFenrirEvents(),
+        loadFenrirAnnouncement()
+      ]);
       refreshDashboard();
       renderEventLists();
-      logLine('DATA: SYNCED FROM SUPABASE');
+      renderFenrirEventLists();
+      logLine('DATA: SYNCED FROM SUPABASE (Legacy + Fenrir)');
     }
 
     async function loadEvents() {
@@ -2037,6 +2122,7 @@
     }
 
     function openEditEvent(id) {
+      state.eventTargetTable = 'events';
       const ev = id
         ? state.events.find(e => e.id === id)
         : state.currentEvent;
@@ -2090,6 +2176,9 @@
         return false;
       }
 
+      const table = state.eventTargetTable === 'fenrir_events' ? 'fenrir_events' : 'events';
+      const isFenrir = table === 'fenrir_events';
+
       let imageUrl = document.getElementById('evImage').value.trim() || null;
       try {
         const uploaded = await uploadBannerIfNeeded();
@@ -2111,15 +2200,17 @@
         updated_at: new Date().toISOString()
       };
 
+      const editId = isFenrir ? state.editingFenrirEventId : state.editingEventId;
+
       let error;
-      if (state.editingEventId) {
+      if (editId) {
         ({ error } = await supabaseClient
-          .from('events')
+          .from(table)
           .update(payload)
-          .eq('id', state.editingEventId));
+          .eq('id', editId));
       } else {
         ({ error } = await supabaseClient
-          .from('events')
+          .from(table)
           .insert([payload]));
       }
 
@@ -2132,10 +2223,16 @@
       if (fileInput) fileInput.value = '';
 
       closeEventModal();
-      logLine('EVENT SAVED: ' + payload.name);
-      await loadEvents();
-      refreshDashboard();
-      renderEventLists();
+      logLine((isFenrir ? 'FENRIR EVENT SAVED: ' : 'EVENT SAVED: ') + payload.name);
+
+      if (isFenrir) {
+        await loadFenrirEvents();
+        renderFenrirEventLists();
+      } else {
+        await loadEvents();
+        refreshDashboard();
+        renderEventLists();
+      }
       return false;
     }
 
@@ -2359,6 +2456,257 @@
     document.getElementById('eventModal').addEventListener('click', function (e) {
       if (e.target === this) closeEventModal();
     });
+  
+
+    // =========================================================
+    // FENRIR YAKUZA (FiveM) — events + announcements
+    // Tables: fenrir_events / fenrir_announcements
+    // =========================================================
+
+    async function loadFenrirEvents() {
+      if (!supabaseClient) return;
+      const { data, error } = await supabaseClient
+        .from('fenrir_events')
+        .select('*')
+        .order('event_date', { ascending: true })
+        .order('event_time', { ascending: true });
+
+      if (error) {
+        console.warn('fenrir_events', error);
+        logLine('WARN: FENRIR EVENTS ' + error.message);
+        state.fenrirEvents = [];
+        state.fenrirCurrentEvent = null;
+        state.fenrirLastMeet = null;
+        return;
+      }
+
+      state.fenrirEvents = data || [];
+      const active = state.fenrirEvents.find(e => e.status === 'active');
+      const soon = state.fenrirEvents.find(e => e.status === 'starting_soon');
+      const scheduled = state.fenrirEvents.filter(e => e.status === 'scheduled' || e.status === 'starting_soon');
+      const ended = state.fenrirEvents.filter(e => e.status === 'ended');
+
+      state.fenrirCurrentEvent = active || soon || scheduled[0] || null;
+      state.fenrirLastMeet = ended.length
+        ? ended.sort((a, b) => String(b.event_date + b.event_time).localeCompare(String(a.event_date + a.event_time)))[0]
+        : null;
+    }
+
+    async function loadFenrirAnnouncement() {
+      if (!supabaseClient) return;
+      const { data, error } = await supabaseClient
+        .from('fenrir_announcements')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.warn('fenrir_announcements', error);
+        logLine('WARN: FENRIR ANNOUNCEMENTS ' + error.message);
+        state.fenrirAnnouncement = null;
+        return;
+      }
+      state.fenrirAnnouncement = (data && data[0]) || null;
+    }
+
+    function renderFenrirEventLists() {
+      const upcoming = state.fenrirEvents.filter(e => e.status !== 'ended');
+      const completed = state.fenrirEvents.filter(e => e.status === 'ended');
+
+      const upEl = document.getElementById('fenrirUpcomingList');
+      const coEl = document.getElementById('fenrirCompletedList');
+      if (!upEl || !coEl) return;
+
+      if (!upcoming.length) {
+        upEl.innerHTML = '<div class="empty-state"><p>No Fenrir events yet.</p></div>';
+      } else {
+        upEl.innerHTML = upcoming.map(ev => `
+          <div class="event-row">
+            <div>
+              <div class="event-row-name">${escapeHtml(ev.name)}</div>
+              <div class="event-row-meta">${formatDateDisplay(ev.event_date)} · ${formatTime(ev.event_time)} · ${escapeHtml(ev.host || '')} · ${escapeHtml(ev.timezone || '')}</div>
+            </div>
+            <span class="badge badge-scheduled">${escapeHtml((ev.status || 'scheduled').toUpperCase())}</span>
+            <div class="event-row-actions">
+              <button class="btn btn-sm" onclick="openEditFenrirEvent(${ev.id})">EDIT</button>
+              ${ev.status !== 'active' ? `<button class="btn btn-sm" onclick="startFenrirSession(${ev.id})">START</button>` : ''}
+              ${ev.status === 'active' || ev.status === 'starting_soon' ? `<button class="btn btn-sm" onclick="endFenrirSession(${ev.id})">END</button>` : ''}
+              <button class="btn btn-sm btn-danger" onclick="confirmDeleteFenrirEvent(${ev.id})">DELETE</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (!completed.length) {
+        coEl.innerHTML = '<div class="empty-state"><p>No completed Fenrir sessions yet.</p></div>';
+      } else {
+        coEl.innerHTML = completed.map(ev => `
+          <div class="event-row">
+            <div>
+              <div class="event-row-name">${escapeHtml(ev.name)}</div>
+              <div class="event-row-meta">${formatDateDisplay(ev.event_date)} · ${formatTime(ev.event_time)} · ${escapeHtml(ev.host || '')}</div>
+            </div>
+            <span class="badge badge-offline">ENDED</span>
+            <div class="event-row-actions">
+              <button class="btn btn-sm" onclick="openEditFenrirEvent(${ev.id})">VIEW</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function openCreateFenrirEvent() {
+      state.eventTargetTable = 'fenrir_events';
+      state.editingFenrirEventId = null;
+      document.getElementById('eventModalTitle').textContent = 'CREATE FENRIR EVENT';
+      document.getElementById('evName').value = '';
+      document.getElementById('evDesc').value = '';
+      document.getElementById('evDate').value = '';
+      document.getElementById('evTime').value = '';
+      document.getElementById('evHost').value = 'Fenrir Staff';
+      document.getElementById('evTz').value = 'America/Sao_Paulo';
+      document.getElementById('evStatus').value = 'scheduled';
+      document.getElementById('evImage').value = '';
+      const bf = document.getElementById('evBannerFile');
+      if (bf) bf.value = '';
+      document.getElementById('eventModal').classList.add('open');
+    }
+
+    function openEditFenrirEvent(id) {
+      state.eventTargetTable = 'fenrir_events';
+      const ev = state.fenrirEvents.find(e => e.id === id);
+      if (!ev) return openCreateFenrirEvent();
+      state.editingFenrirEventId = ev.id;
+      document.getElementById('eventModalTitle').textContent = 'EDIT FENRIR EVENT';
+      document.getElementById('evName').value = ev.name || '';
+      document.getElementById('evDesc').value = ev.description || '';
+      document.getElementById('evDate').value = String(ev.event_date).slice(0, 10);
+      document.getElementById('evTime').value = formatTime(ev.event_time);
+      document.getElementById('evHost').value = ev.host || '';
+      document.getElementById('evTz').value = ev.timezone || 'America/Sao_Paulo';
+      document.getElementById('evStatus').value = ev.status || 'scheduled';
+      document.getElementById('evImage').value = ev.image_url || '';
+      const bf2 = document.getElementById('evBannerFile');
+      if (bf2) bf2.value = '';
+      document.getElementById('eventModal').classList.add('open');
+    }
+
+    async function startFenrirSession(id) {
+      if (!supabaseClient) {
+        alert('Not connected to Supabase.');
+        return;
+      }
+      const targetId = id || (state.fenrirCurrentEvent && state.fenrirCurrentEvent.id);
+      if (!targetId) {
+        alert('No Fenrir event selected.');
+        return;
+      }
+      const { error } = await supabaseClient
+        .from('fenrir_events')
+        .update({ status: 'active', updated_at: new Date().toISOString() })
+        .eq('id', targetId);
+      if (error) {
+        alert('Failed to start Fenrir session: ' + error.message);
+        return;
+      }
+      logLine('FENRIR SESSION: STARTED · id ' + targetId);
+      await loadFenrirEvents();
+      renderFenrirEventLists();
+    }
+
+    async function endFenrirSession(id) {
+      if (!supabaseClient) {
+        alert('Not connected to Supabase.');
+        return;
+      }
+      const targetId = id || (state.fenrirCurrentEvent && state.fenrirCurrentEvent.id);
+      if (!targetId) {
+        alert('No Fenrir event selected.');
+        return;
+      }
+      // Only status → ended. Never clear image_url (Last Meet banner in app).
+      const { error } = await supabaseClient
+        .from('fenrir_events')
+        .update({ status: 'ended', updated_at: new Date().toISOString() })
+        .eq('id', targetId);
+      if (error) {
+        alert('Failed to end Fenrir session: ' + error.message);
+        return;
+      }
+      logLine('FENRIR SESSION: ENDED · LAST MEET UPDATED (banner kept)');
+      await loadFenrirEvents();
+      renderFenrirEventLists();
+    }
+
+    async function confirmDeleteFenrirEvent(id) {
+      if (!id || !supabaseClient) return;
+      if (!confirm('Delete this Fenrir event permanently?')) return;
+      const { error } = await supabaseClient.from('fenrir_events').delete().eq('id', id);
+      if (error) {
+        alert('Delete failed: ' + error.message);
+        return;
+      }
+      logLine('FENRIR EVENT DELETED · id ' + id);
+      await loadFenrirEvents();
+      renderFenrirEventLists();
+    }
+
+    function fillFenrirAnnouncementForm() {
+      const a = state.fenrirAnnouncement;
+      const titleEl = document.getElementById('fenrirAnnTitle');
+      const msgEl = document.getElementById('fenrirAnnMessage');
+      const pTitle = document.getElementById('fenrirAnnPreviewTitle');
+      const pMsg = document.getElementById('fenrirAnnPreviewMsg');
+      if (!titleEl) return;
+      titleEl.value = (a && a.title) || '';
+      msgEl.value = (a && a.message) || '';
+      pTitle.textContent = (a && a.title) || '—';
+      pMsg.textContent = (a && a.message) || 'No Fenrir announcement published.';
+    }
+
+    async function publishFenrirAnnouncement(e) {
+      e.preventDefault();
+      if (!supabaseClient) {
+        alert('Not connected to Supabase.');
+        return false;
+      }
+      const title = document.getElementById('fenrirAnnTitle').value.trim();
+      const message = document.getElementById('fenrirAnnMessage').value.trim();
+      if (!title && !message) {
+        alert('Title or message required.');
+        return false;
+      }
+
+      // Keep a single current announcement: clear then insert
+      await supabaseClient.from('fenrir_announcements').delete().neq('id', 0);
+      const { error } = await supabaseClient
+        .from('fenrir_announcements')
+        .insert([{ title: title || null, message: message || null }]);
+
+      if (error) {
+        alert('Publish failed: ' + error.message);
+        return false;
+      }
+      logLine('FENRIR ANNOUNCEMENT PUBLISHED');
+      await loadFenrirAnnouncement();
+      fillFenrirAnnouncementForm();
+      return false;
+    }
+
+    async function removeFenrirAnnouncement() {
+      if (!supabaseClient) return;
+      if (!confirm('Remove current Fenrir announcement?')) return;
+      const { error } = await supabaseClient.from('fenrir_announcements').delete().neq('id', 0);
+      if (error) {
+        alert('Remove failed: ' + error.message);
+        return;
+      }
+      logLine('FENRIR ANNOUNCEMENT REMOVED');
+      state.fenrirAnnouncement = null;
+      fillFenrirAnnouncementForm();
+    }
+
+
   </script>
 </body>
 </html>
