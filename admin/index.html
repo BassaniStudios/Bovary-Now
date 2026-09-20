@@ -510,6 +510,137 @@
 
     .btn-ghost { background: transparent; }
 
+    .btn-warn {
+      border-color: rgba(251, 191, 36, 0.4);
+      color: var(--yellow);
+    }
+    .btn-warn:hover {
+      background: rgba(251, 191, 36, 0.12);
+      border-color: rgba(251, 191, 36, 0.6);
+    }
+    .btn-success {
+      border-color: rgba(52, 211, 153, 0.4);
+      color: var(--green);
+    }
+    .btn-success:hover {
+      background: rgba(52, 211, 153, 0.12);
+      border-color: rgba(52, 211, 153, 0.6);
+    }
+    .btn:disabled, .btn.loading {
+      opacity: 0.55;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+    .btn.loading::after {
+      content: '';
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin-left: 8px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* Toast */
+    #toastContainer {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      min-width: 280px;
+      max-width: 420px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+      font-size: 13px;
+      color: var(--text);
+      animation: toastIn 0.25s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .toast.ok { border-color: rgba(52, 211, 153, 0.45); }
+    .toast.err { border-color: rgba(248, 113, 113, 0.5); }
+    .toast.warn { border-color: rgba(251, 191, 36, 0.45); }
+    .toast .toast-icon { font-size: 16px; line-height: 1.2; }
+    .toast .toast-body { flex: 1; }
+    .toast .toast-title { font-weight: 600; margin-bottom: 2px; font-size: 13px; }
+    .toast .toast-msg { color: var(--text-muted); font-size: 12px; line-height: 1.4; }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .push-preview {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+    .push-preview .pp-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .push-preview .pp-body {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .push-result {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: rgba(124,58,237,0.08);
+      border: 1px solid var(--border);
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      display: none;
+    }
+    .push-result.visible { display: block; }
+    .form-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .checkbox-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--purple);
+    }
+
+
     .btn-sm {
       padding: 7px 12px;
       font-size: 10px;
@@ -1042,6 +1173,7 @@
   <div class="bg-grid"></div>
   <div class="bg-glow"></div>
   <div class="scanlines"></div>
+  <div id="toastContainer"></div>
 
   <!-- LOGIN -->
   <div class="login-screen" id="loginScreen">
@@ -1128,23 +1260,31 @@
     <div class="layout">
 
       <aside class="sidebar">
-        <div class="nav-section">Core</div>
+        <div class="nav-section">Overview</div>
         <button class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
           <span class="nav-icon">◈</span> DASHBOARD
         </button>
+
+        <div class="nav-section">Server Legacy</div>
+        <button class="nav-item" data-page="legacy" onclick="navigate('legacy')">
+          <span class="nav-icon">◉</span> CONTROL
+        </button>
         <button class="nav-item" data-page="events" onclick="navigate('events')">
-          <span class="nav-icon">▣</span> EVENTS
+          <span class="nav-icon">▣</span> CAR MEETS
         </button>
         <button class="nav-item" data-page="announcements" onclick="navigate('announcements')">
-          <span class="nav-icon">◉</span> ANNOUNCEMENTS
+          <span class="nav-icon">☰</span> ANNOUNCEMENTS
         </button>
 
         <div class="nav-section">Fenrir Yakuza</div>
+        <button class="nav-item" data-page="fenrir" onclick="navigate('fenrir')">
+          <span class="nav-icon">⚔</span> CONTROL
+        </button>
         <button class="nav-item" data-page="fenrir-events" onclick="navigate('fenrir-events')">
-          <span class="nav-icon">⚔</span> FENRIR EVENTS
+          <span class="nav-icon">▣</span> EVENTS
         </button>
         <button class="nav-item" data-page="fenrir-announcements" onclick="navigate('fenrir-announcements')">
-          <span class="nav-icon">☰</span> FENRIR ANNOUNCEMENTS
+          <span class="nav-icon">☰</span> ANNOUNCEMENTS
         </button>
 
         <div class="nav-section">System</div>
@@ -1168,118 +1308,85 @@
 
       <main class="main">
 
-        <!-- DASHBOARD -->
+        <!-- DASHBOARD — dual server overview -->
         <section class="page active" id="page-dashboard">
           <div class="page-header">
             <div>
               <h1>DASHBOARD</h1>
-              <p>Real-time session control · Bovary Club Society</p>
+              <p>Overview · Server Legacy + Fenrir Yakuza</p>
             </div>
             <div class="header-actions">
               <button class="btn btn-sm" onclick="refreshDashboard()">↻ REFRESH</button>
             </div>
           </div>
 
-          <!-- Status strip: 4 equal cards on desktop -->
-          <div class="status-strip" style="margin-bottom:18px;">
-            <div class="card">
-              <div class="card-label">Current Status</div>
-              <div id="dashStatusBadge" class="badge badge-soon">🟡 STARTING SOON</div>
-              <p class="mt-12" id="dashStatusText">Next session is scheduled.</p>
-            </div>
-
-            <div class="card">
-              <div class="card-label">Next Event</div>
-              <h2 id="dashNextName">JDM Night</h2>
-              <p id="dashNextWhen">07 SEP 2026 · 21:00</p>
-            </div>
-
-            <div class="card">
-              <div class="card-label">Host</div>
-              <h2 id="dashHost">Bovary Staff</h2>
-              <p>Event host</p>
-            </div>
-
-            <div class="card">
-              <div class="card-label">Last Meet</div>
-              <h2 id="dashLastMeet">—</h2>
-              <p id="dashLastWhen">No completed session yet</p>
-            </div>
-          </div>
-
-          <!-- Main event + live preview -->
-          <div class="main-row" style="margin-bottom:18px;">
-            <div class="card">
-              <div class="card-label">Current / Next Event</div>
-              <h2 id="dashEventName">JDM Night</h2>
-              <div class="event-banner" id="dashBanner">
-                <span>BANNER · EVENT IMAGE</span>
-              </div>
-              <div class="event-info">
+          <div class="grid" style="margin-bottom:18px;">
+            <!-- LEGACY OVERVIEW CARD -->
+            <div class="card col-6">
+              <div class="card-label">Server Legacy · Status</div>
+              <div id="ovLegacyBadge" class="badge badge-offline">⚫ OFFLINE</div>
+              <p class="mt-12" id="ovLegacyText" style="font-size:13px;color:var(--text-muted);">No active session.</p>
+              <div class="event-info mt-16">
                 <div class="info-box">
-                  <small>Date</small>
-                  <strong id="dashDate">07/09/2026</strong>
+                  <small>Current / Next</small>
+                  <strong id="ovLegacyName">—</strong>
                 </div>
                 <div class="info-box">
-                  <small>Time</small>
-                  <strong id="dashTime">21:00</strong>
+                  <small>When</small>
+                  <strong id="ovLegacyWhen">—</strong>
                 </div>
                 <div class="info-box">
-                  <small>Timezone</small>
-                  <strong id="dashTz">America/Sao_Paulo</strong>
+                  <small>Last Meet</small>
+                  <strong id="ovLegacyLast">—</strong>
                 </div>
               </div>
-              <p class="mt-12" id="dashDesc" style="font-size:13px; color:var(--text-muted);">
-                A night dedicated to Japanese cars, builds and street culture.
-              </p>
               <div class="actions">
-                <button class="btn btn-primary" onclick="openEditEvent()">EDIT EVENT</button>
-                <button class="btn btn-cyan" onclick="startSession()">START SESSION</button>
-                <button class="btn btn-danger" onclick="endSession()">END SESSION</button>
+                <button class="btn btn-sm btn-primary" onclick="navigate('legacy')">OPEN CONTROL</button>
+                <button class="btn btn-sm" onclick="navigate('events')">CAR MEETS</button>
               </div>
             </div>
 
-            <div class="card">
-              <div class="card-label">Live Preview · Member App</div>
-              <div class="phone-frame">
-                <div class="phone-header">BOVARY NOW</div>
-                <div class="phone-status" id="previewStatus">🟡 STARTING SOON</div>
-                <div class="phone-banner" id="previewBanner">BANNER</div>
-                <div class="phone-event-name" id="previewName">JDM Night</div>
-                <div class="phone-countdown" id="previewCountdown">--:--:--</div>
-                <div class="phone-desc" id="previewDesc">A night dedicated to Japanese cars, builds and street culture.</div>
-                <div class="phone-meta" id="previewMeta">HOST · BOVARY STAFF</div>
-                <div class="phone-tabs">
-                  <span class="phone-tab active">NOW</span>
-                  <span class="phone-tab">EVENTS</span>
-                  <span class="phone-tab">SETTINGS</span>
+            <!-- FENRIR OVERVIEW CARD -->
+            <div class="card col-6">
+              <div class="card-label">Fenrir Yakuza · Status</div>
+              <div id="ovFenrirBadge" class="badge badge-offline">⚫ OFFLINE</div>
+              <p class="mt-12" id="ovFenrirText" style="font-size:13px;color:var(--text-muted);">No active session.</p>
+              <div class="event-info mt-16">
+                <div class="info-box">
+                  <small>Current / Next</small>
+                  <strong id="ovFenrirName">—</strong>
                 </div>
+                <div class="info-box">
+                  <small>When</small>
+                  <strong id="ovFenrirWhen">—</strong>
+                </div>
+                <div class="info-box">
+                  <small>Last Meet</small>
+                  <strong id="ovFenrirLast">—</strong>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn btn-sm btn-primary" onclick="navigate('fenrir')">OPEN CONTROL</button>
+                <button class="btn btn-sm" onclick="navigate('fenrir-events')">EVENTS</button>
               </div>
             </div>
           </div>
 
-          <!-- Countdown + Announcement -->
           <div class="bottom-row" style="margin-bottom:18px;">
             <div class="card">
-              <div class="card-label">Countdown</div>
-              <div style="font-family:var(--font-display); font-size:36px; font-weight:700; letter-spacing:0.08em; color:var(--cyan); text-shadow:0 0 24px rgba(34,211,238,0.35);" id="dashCountdown">
-                --:--:--
+              <div class="card-label">Legacy · Announcement</div>
+              <div id="ovLegacyAnn">
+                <p class="text-dim" style="font-size:13px;">No announcement.</p>
               </div>
-              <p class="mt-8 text-dim" style="font-size:12px;">Until scheduled start</p>
             </div>
-
             <div class="card">
-              <div class="card-label">Daily Announcement</div>
-              <div id="dashAnnouncement">
-                <p class="text-dim" style="font-size:13px;">No announcement published.</p>
-              </div>
-              <div class="actions">
-                <button class="btn btn-sm" onclick="navigate('announcements')">MANAGE</button>
+              <div class="card-label">Fenrir · Announcement</div>
+              <div id="ovFenrirAnn">
+                <p class="text-dim" style="font-size:13px;">No announcement.</p>
               </div>
             </div>
           </div>
 
-          <!-- System log full width -->
           <div class="card">
             <div class="card-label">System Log</div>
             <div id="systemLog">
@@ -1291,15 +1398,124 @@
           </div>
         </section>
 
+        <!-- SERVER LEGACY — CONTROL (same model as former Dashboard) -->
+        <section class="page" id="page-legacy">
+          <div class="page-header">
+            <div>
+              <h1>SERVER LEGACY</h1>
+              <p>Real-time session control · Bovary Club Society</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-sm" onclick="refreshLegacyControl()">↻ REFRESH</button>
+            </div>
+          </div>
+
+          <div class="status-strip" style="margin-bottom:18px;">
+            <div class="card">
+              <div class="card-label">Current Status</div>
+              <div id="dashStatusBadge" class="badge badge-offline">⚫ OFFLINE</div>
+              <p class="mt-12" id="dashStatusText">No active session.</p>
+            </div>
+            <div class="card">
+              <div class="card-label">Next Event</div>
+              <h2 id="dashNextName">—</h2>
+              <p id="dashNextWhen">—</p>
+            </div>
+            <div class="card">
+              <div class="card-label">Host</div>
+              <h2 id="dashHost">—</h2>
+              <p>Event host</p>
+            </div>
+            <div class="card">
+              <div class="card-label">Last Meet</div>
+              <h2 id="dashLastMeet">—</h2>
+              <p id="dashLastWhen">No completed session yet</p>
+            </div>
+          </div>
+
+          <div class="main-row" style="margin-bottom:18px;">
+            <div class="card">
+              <div class="card-label">Current / Next Event</div>
+              <h2 id="dashEventName">—</h2>
+              <div class="event-banner" id="dashBanner">
+                <span>BANNER · EVENT IMAGE</span>
+              </div>
+              <div class="event-info">
+                <div class="info-box">
+                  <small>Date</small>
+                  <strong id="dashDate">—</strong>
+                </div>
+                <div class="info-box">
+                  <small>Time</small>
+                  <strong id="dashTime">—</strong>
+                </div>
+                <div class="info-box">
+                  <small>Timezone</small>
+                  <strong id="dashTz">America/Sao_Paulo</strong>
+                </div>
+              </div>
+              <p class="mt-12" id="dashDesc" style="font-size:13px; color:var(--text-muted);">—</p>
+              <div class="actions status-actions" id="dashStatusActions">
+                <button class="btn btn-primary" onclick="openEditEvent()">EDIT</button>
+                <button class="btn btn-warn" onclick="setCurrentStatus('starting_soon')" title="Mark as starting soon">SOON</button>
+                <button class="btn btn-success" onclick="setCurrentStatus('active')" title="Start live session">START</button>
+                <button class="btn btn-danger" onclick="setCurrentStatus('ended')" title="End session (keeps banner)">END</button>
+                <button class="btn btn-ghost btn-sm" onclick="setCurrentStatus('scheduled')" title="Reset to scheduled">CANCEL</button>
+              </div>
+              <div class="checkbox-row">
+                <input type="checkbox" id="dashPushOnStart" checked />
+                <label for="dashPushOnStart">Send push when starting session</label>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-label">Live Preview · Member App</div>
+              <div class="phone-frame">
+                <div class="phone-header">BOVARY NOW</div>
+                <div class="phone-status" id="previewStatus">⚫ NO ACTIVE SESSION</div>
+                <div class="phone-banner" id="previewBanner">BANNER</div>
+                <div class="phone-event-name" id="previewName">—</div>
+                <div class="phone-countdown" id="previewCountdown">--:--:--</div>
+                <div class="phone-desc" id="previewDesc">—</div>
+                <div class="phone-meta" id="previewMeta">HOST · —</div>
+                <div class="phone-tabs">
+                  <span class="phone-tab active">LEGACY</span>
+                  <span class="phone-tab">EVENTS</span>
+                  <span class="phone-tab">SETTINGS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bottom-row" style="margin-bottom:18px;">
+            <div class="card">
+              <div class="card-label">Countdown</div>
+              <div style="font-family:var(--font-display); font-size:36px; font-weight:700; letter-spacing:0.08em; color:var(--cyan); text-shadow:0 0 24px rgba(34,211,238,0.35);" id="dashCountdown">
+                --:--:--
+              </div>
+              <p class="mt-8 text-dim" style="font-size:12px;">Until scheduled start</p>
+            </div>
+            <div class="card">
+              <div class="card-label">Daily Announcement</div>
+              <div id="dashAnnouncement">
+                <p class="text-dim" style="font-size:13px;">No announcement published.</p>
+              </div>
+              <div class="actions">
+                <button class="btn btn-sm" onclick="navigate('announcements')">MANAGE</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- EVENTS -->
         <section class="page" id="page-events">
           <div class="page-header">
             <div>
-              <h1>EVENTS</h1>
-              <p>Create, edit and control Bovary sessions</p>
+              <h1>CAR MEETS</h1>
+              <p>Server Legacy · create, edit and control meets</p>
             </div>
             <div class="header-actions">
-              <button class="btn btn-primary" onclick="openCreateEvent()">+ CREATE EVENT</button>
+              <button class="btn btn-primary" onclick="openCreateEvent()">+ CREATE MEET</button>
             </div>
           </div>
 
@@ -1325,7 +1541,7 @@
 
             <div class="card col-12">
               <div class="list-header">
-                <span class="list-title">COMPLETED / LAST MEETS</span>
+                <span class="list-title">COMPLETED / PAST MEETS</span>
               </div>
               <div id="completedList">
                 <div class="empty-state">
@@ -1336,6 +1552,115 @@
           </div>
         </section>
 
+
+        <!-- FENRIR YAKUZA — CONTROL (same model as Server Legacy) -->
+        <section class="page" id="page-fenrir">
+          <div class="page-header">
+            <div>
+              <h1>FENRIR YAKUZA</h1>
+              <p>Real-time session control · FiveM</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-sm" onclick="refreshFenrirControl()">↻ REFRESH</button>
+            </div>
+          </div>
+
+          <div class="status-strip" style="margin-bottom:18px;">
+            <div class="card">
+              <div class="card-label">Current Status</div>
+              <div id="fenStatusBadge" class="badge badge-offline">⚫ OFFLINE</div>
+              <p class="mt-12" id="fenStatusText">No active session.</p>
+            </div>
+            <div class="card">
+              <div class="card-label">Next Event</div>
+              <h2 id="fenNextName">—</h2>
+              <p id="fenNextWhen">—</p>
+            </div>
+            <div class="card">
+              <div class="card-label">Host</div>
+              <h2 id="fenHost">—</h2>
+              <p>Event host</p>
+            </div>
+            <div class="card">
+              <div class="card-label">Last Meet</div>
+              <h2 id="fenLastMeet">—</h2>
+              <p id="fenLastWhen">No completed session yet</p>
+            </div>
+          </div>
+
+          <div class="main-row" style="margin-bottom:18px;">
+            <div class="card">
+              <div class="card-label">Current / Next Event</div>
+              <h2 id="fenEventName">—</h2>
+              <div class="event-banner" id="fenBanner">
+                <span>BANNER · EVENT IMAGE</span>
+              </div>
+              <div class="event-info">
+                <div class="info-box">
+                  <small>Date</small>
+                  <strong id="fenDate">—</strong>
+                </div>
+                <div class="info-box">
+                  <small>Time</small>
+                  <strong id="fenTime">—</strong>
+                </div>
+                <div class="info-box">
+                  <small>Timezone</small>
+                  <strong id="fenTz">America/Sao_Paulo</strong>
+                </div>
+              </div>
+              <p class="mt-12" id="fenDesc" style="font-size:13px; color:var(--text-muted);">—</p>
+              <div class="actions status-actions" id="fenStatusActions">
+                <button class="btn btn-primary" onclick="openEditFenrirEvent()">EDIT</button>
+                <button class="btn btn-warn" onclick="setFenrirCurrentStatus('starting_soon')">SOON</button>
+                <button class="btn btn-success" onclick="setFenrirCurrentStatus('active')">START</button>
+                <button class="btn btn-danger" onclick="setFenrirCurrentStatus('ended')">END</button>
+                <button class="btn btn-ghost btn-sm" onclick="setFenrirCurrentStatus('scheduled')">CANCEL</button>
+              </div>
+              <div class="checkbox-row">
+                <input type="checkbox" id="fenPushOnStart" checked />
+                <label for="fenPushOnStart">Send push when starting session</label>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-label">Live Preview · Member App · FiveM</div>
+              <div class="phone-frame">
+                <div class="phone-header">BOVARY NOW</div>
+                <div class="phone-status" id="fenPreviewStatus">⚫ NO ACTIVE SESSION</div>
+                <div class="phone-banner" id="fenPreviewBanner">BANNER</div>
+                <div class="phone-event-name" id="fenPreviewName">—</div>
+                <div class="phone-countdown" id="fenPreviewCountdown">--:--:--</div>
+                <div class="phone-desc" id="fenPreviewDesc">—</div>
+                <div class="phone-meta" id="fenPreviewMeta">HOST · —</div>
+                <div class="phone-tabs">
+                  <span class="phone-tab active">FIVEM</span>
+                  <span class="phone-tab">EVENTS</span>
+                  <span class="phone-tab">SETTINGS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bottom-row" style="margin-bottom:18px;">
+            <div class="card">
+              <div class="card-label">Countdown</div>
+              <div style="font-family:var(--font-display); font-size:36px; font-weight:700; letter-spacing:0.08em; color:var(--cyan); text-shadow:0 0 24px rgba(34,211,238,0.35);" id="fenCountdown">
+                --:--:--
+              </div>
+              <p class="mt-8 text-dim" style="font-size:12px;">Until scheduled start</p>
+            </div>
+            <div class="card">
+              <div class="card-label">Fenrir Announcement</div>
+              <div id="fenAnnouncementBox">
+                <p class="text-dim" style="font-size:13px;">No announcement published.</p>
+              </div>
+              <div class="actions">
+                <button class="btn btn-sm" onclick="navigate('fenrir-announcements')">MANAGE</button>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <!-- FENRIR EVENTS (FiveM) -->
         <section class="page" id="page-fenrir-events">
@@ -1446,37 +1771,73 @@
           <div class="page-header">
             <div>
               <h1>NOTIFICATIONS</h1>
-              <p>Push notification configuration (Phase 7)</p>
+              <p>Send push to members via FCM · Edge Function send-push</p>
             </div>
           </div>
 
           <div class="grid">
-            <div class="card col-12">
-              <div class="card-label">Planned Triggers</div>
+            <div class="card col-6">
+              <div class="card-label">Send Push Now</div>
+              <form id="pushForm" onsubmit="return sendPushManual(event)">
+                <div class="form-group mb-12">
+                  <label>Target</label>
+                  <select id="pushTarget">
+                    <option value="all">All devices</option>
+                    <option value="legacy">Legacy only (notify_legacy)</option>
+                    <option value="fivem">FiveM only (notify_fivem)</option>
+                  </select>
+                </div>
+                <div class="form-group mb-12">
+                  <label>Title</label>
+                  <input type="text" id="pushTitle" maxlength="80" required placeholder="🟢 BOVARY NOW — SESSION ACTIVE" />
+                </div>
+                <div class="form-group mb-12">
+                  <label>Body</label>
+                  <textarea id="pushBody" maxlength="240" required placeholder="JDM Night is live now. Open Bovary Now."></textarea>
+                </div>
+                <div class="push-preview">
+                  <div class="pp-title" id="pushPrevTitle">Notification title</div>
+                  <div class="pp-body" id="pushPrevBody">Notification body preview</div>
+                </div>
+                <div class="actions" style="margin-top:16px;">
+                  <button type="submit" class="btn btn-primary" id="btnSendPush">SEND PUSH</button>
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="fillPushTemplate('active')">Template: Active</button>
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="fillPushTemplate('soon')">Template: Soon</button>
+                </div>
+                <div class="push-result" id="pushResult"></div>
+              </form>
+              <p class="form-hint mt-16">
+                Requires device_tokens populated by the Android app v1.1.0+.
+                Edge Function: <code style="color:var(--cyan);">send-push</code> · JWT verification ON.
+              </p>
+            </div>
+
+            <div class="card col-6">
+              <div class="card-label">Planned Auto Triggers</div>
               <div class="event-row">
                 <div>
                   <div class="event-row-name">30 minutes before</div>
-                  <div class="event-row-meta">🏎️ BOVARY NOW — Event starts in 30 minutes</div>
+                  <div class="event-row-meta">🏎️ Event starts in 30 minutes</div>
                 </div>
                 <span class="badge badge-scheduled">PLANNED</span>
               </div>
               <div class="event-row">
                 <div>
                   <div class="event-row-name">5 minutes before</div>
-                  <div class="event-row-meta">⚠️ BOVARY NOW — Event starts in 5 minutes</div>
+                  <div class="event-row-meta">⚠️ Event starts in 5 minutes</div>
                 </div>
                 <span class="badge badge-scheduled">PLANNED</span>
               </div>
               <div class="event-row">
                 <div>
-                  <div class="event-row-name">At start</div>
-                  <div class="event-row-meta">🟢 BOVARY NOW — SESSION ACTIVE · Event is now live</div>
+                  <div class="event-row-name">On START (manual)</div>
+                  <div class="event-row-meta">Uses checkbox on Dashboard / Events</div>
                 </div>
-                <span class="badge badge-scheduled">PLANNED</span>
+                <span class="badge badge-active">READY</span>
               </div>
-              <p class="mt-16 text-dim" style="font-size:13px;">
-                Push system will be connected after Android app + FCM / Supabase edge functions.
-                This panel will allow enable/disable and custom messages.
+              <p class="mt-16 text-dim" style="font-size:13px; line-height:1.6;">
+                Auto-scheduled triggers (30m / 5m) will need a cron or Supabase scheduled function.
+                Manual send and “push on START” are available now.
               </p>
             </div>
           </div>
@@ -1585,6 +1946,11 @@
                 <option value="ended">ended</option>
               </select>
             </div>
+            <div class="form-group">
+              <label>Auto-end after (hours)</label>
+              <input type="number" id="evAutoEndHours" min="1" max="48" step="1" value="5" />
+              <p class="form-hint">Session ends automatically this many hours after event start. Default: 5. Panel only — no app change needed.</p>
+            </div>
             <div class="form-group full">
               <label>Banner URL (optional)</label>
               <input type="url" id="evImage" placeholder="https://... or leave empty and upload file" />
@@ -1625,11 +1991,54 @@
       editingEventId: null,
       fenrirEvents: [],
       fenrirCurrentEvent: null,
+      fenrirSessionStatus: 'offline',
       fenrirLastMeet: null,
       fenrirAnnouncement: null,
       editingFenrirEventId: null,
-      eventTargetTable: 'events'
+      eventTargetTable: 'events',
+      pushOnStart: true
     };
+
+    // ---------- Toast / feedback ----------
+    function toast(title, msg, type) {
+      type = type || 'ok';
+      const box = document.getElementById('toastContainer');
+      if (!box) { console.log(title, msg); return; }
+      const el = document.createElement('div');
+      el.className = 'toast ' + type;
+      const icons = { ok: '✓', err: '✕', warn: '!' };
+      el.innerHTML = '<span class="toast-icon">' + (icons[type] || '•') + '</span>' +
+        '<div class="toast-body"><div class="toast-title">' + escapeHtml(title) + '</div>' +
+        (msg ? '<div class="toast-msg">' + escapeHtml(msg) + '</div>' : '') + '</div>';
+      box.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => el.remove(), 320); }, 4200);
+    }
+
+    function statusBadgeClass(status) {
+      const s = (status || 'scheduled').toLowerCase();
+      if (s === 'active') return 'badge-active';
+      if (s === 'starting_soon') return 'badge-soon';
+      if (s === 'ended') return 'badge-offline';
+      return 'badge-scheduled';
+    }
+
+    function statusLabel(status) {
+      const s = (status || 'scheduled').toLowerCase();
+      if (s === 'active') return 'ACTIVE';
+      if (s === 'starting_soon') return 'STARTING SOON';
+      if (s === 'ended') return 'ENDED';
+      return 'SCHEDULED';
+    }
+
+    function escapeHtml(str) {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
 
     // ---------- Config / client ----------
     function getConfig() {
@@ -1671,10 +2080,14 @@
       if (el) el.classList.add('active');
       const nav = document.querySelector('.nav-item[data-page="' + page + '"]');
       if (nav) nav.classList.add('active');
+      if (page === 'dashboard') refreshDashboard();
+      if (page === 'legacy') refreshLegacyControl();
       if (page === 'events') renderEventLists();
       if (page === 'announcements') fillAnnouncementForm();
+      if (page === 'fenrir') refreshFenrirControl();
       if (page === 'fenrir-events') renderFenrirEventLists();
       if (page === 'fenrir-announcements') fillFenrirAnnouncementForm();
+      if (page === 'notifications') updatePushPreview();
     }
 
     // ---------- Auth ----------
@@ -1788,6 +2201,7 @@
       renderEventLists();
       renderFenrirEventLists();
       logLine('DATA: SYNCED FROM SUPABASE (Legacy + Fenrir)');
+      checkAndAutoEndSessions();
     }
 
     async function loadEvents() {
@@ -1933,130 +2347,409 @@
       return String(t).slice(0, 5);
     }
 
+    function applyStatusBadge(badgeEl, textEl, prevEl, status) {
+      if (!badgeEl) return;
+      badgeEl.className = 'badge';
+      if (status === 'active') {
+        badgeEl.classList.add('badge-active');
+        badgeEl.textContent = '🟢 SESSION ACTIVE';
+        if (textEl) textEl.textContent = 'Session is live now.';
+        if (prevEl) { prevEl.textContent = '🟢 SESSION ACTIVE'; prevEl.style.color = 'var(--green)'; }
+      } else if (status === 'starting_soon') {
+        badgeEl.classList.add('badge-soon');
+        badgeEl.textContent = '🟡 STARTING SOON';
+        if (textEl) textEl.textContent = 'Next session is approaching.';
+        if (prevEl) { prevEl.textContent = '🟡 STARTING SOON'; prevEl.style.color = 'var(--yellow)'; }
+      } else if (status === 'scheduled') {
+        badgeEl.classList.add('badge-scheduled');
+        badgeEl.textContent = 'SCHEDULED';
+        if (textEl) textEl.textContent = 'Event is scheduled.';
+        if (prevEl) { prevEl.textContent = 'SCHEDULED'; prevEl.style.color = 'var(--text-muted)'; }
+      } else {
+        badgeEl.classList.add('badge-offline');
+        badgeEl.textContent = '⚫ OFFLINE';
+        if (textEl) textEl.textContent = 'No active session.';
+        if (prevEl) { prevEl.textContent = '⚫ NO ACTIVE SESSION'; prevEl.style.color = 'var(--text-dim)'; }
+      }
+    }
+
+    function setBanner(el, url, placeholder) {
+      if (!el) return;
+      if (url) {
+        el.innerHTML = '<img src="' + escapeAttr(url) + '" alt="banner" style="width:100%;height:100%;object-fit:cover;" />';
+      } else {
+        el.innerHTML = '<span>' + (placeholder || 'BANNER') + '</span>';
+      }
+    }
+
+    /** Dual overview — both servers */
     function refreshDashboard() {
-      const ev = state.currentEvent;
-
-      document.getElementById('dashNextName').textContent = ev ? ev.name : '—';
-      document.getElementById('dashNextWhen').textContent = ev
-        ? formatDateDisplay(ev.event_date) + ' · ' + formatTime(ev.event_time)
-        : '—';
-      document.getElementById('dashHost').textContent = (ev && ev.host) || '—';
-      document.getElementById('dashEventName').textContent = ev ? ev.name : 'No event';
-      document.getElementById('dashDate').textContent = ev
-        ? String(ev.event_date).slice(0, 10).split('-').reverse().join('/')
-        : '—';
-      document.getElementById('dashTime').textContent = ev ? formatTime(ev.event_time) : '—';
-      document.getElementById('dashTz').textContent = (ev && ev.timezone) || '—';
-      document.getElementById('dashDesc').textContent = (ev && ev.description) || '';
-
-      // Banner
-      const banner = document.getElementById('dashBanner');
-      const previewBanner = document.getElementById('previewBanner');
-      if (ev && ev.image_url) {
-        banner.innerHTML = '<img src="' + escapeAttr(ev.image_url) + '" alt="banner" style="width:100%;height:100%;object-fit:cover;" />';
-        previewBanner.innerHTML = '<img src="' + escapeAttr(ev.image_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />';
-      } else {
-        banner.innerHTML = '<span>BANNER · EVENT IMAGE</span>';
-        previewBanner.textContent = 'BANNER';
-      }
-
-      document.getElementById('previewName').textContent = ev ? ev.name : '—';
-      document.getElementById('previewDesc').textContent = (ev && ev.description) || '';
-      document.getElementById('previewMeta').textContent = 'HOST · ' + ((ev && ev.host) || '—').toUpperCase();
-
-      updateStatusUI(state.sessionStatus);
-
-      if (state.lastMeet) {
-        document.getElementById('dashLastMeet').textContent = state.lastMeet.name;
-        document.getElementById('dashLastWhen').textContent =
-          formatDateDisplay(state.lastMeet.event_date) + ' · ' + formatTime(state.lastMeet.event_time);
-      } else {
-        document.getElementById('dashLastMeet').textContent = '—';
-        document.getElementById('dashLastWhen').textContent = 'No completed session yet';
-      }
+      // Legacy side
+      const legEv = state.currentEvent;
+      const legStatus = state.sessionStatus || 'offline';
+      applyStatusBadge(
+        document.getElementById('ovLegacyBadge'),
+        document.getElementById('ovLegacyText'),
+        null,
+        legStatus
+      );
+      const setTxt = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+      setTxt('ovLegacyName', legEv ? legEv.name : '—');
+      setTxt('ovLegacyWhen', legEv
+        ? formatDateDisplay(legEv.event_date) + ' · ' + formatTime(legEv.event_time)
+        : '—');
+      setTxt('ovLegacyLast', state.lastMeet ? state.lastMeet.name : '—');
 
       if (state.announcement) {
-        document.getElementById('dashAnnouncement').innerHTML =
-          '<div style="font-family:var(--font-display); font-size:13px; font-weight:600; margin-bottom:4px;">' +
-          escapeHtml(state.announcement.title || '') + '</div>' +
-          '<p style="font-size:13px; color:var(--text-muted);">' +
-          escapeHtml(state.announcement.message || '') + '</p>';
+        const box = document.getElementById('ovLegacyAnn');
+        if (box) box.innerHTML =
+          '<div style="font-weight:600;margin-bottom:4px;">' + escapeHtml(state.announcement.title || '') + '</div>' +
+          '<p style="font-size:13px;color:var(--text-muted);">' + escapeHtml(state.announcement.message || '') + '</p>';
       } else {
-        document.getElementById('dashAnnouncement').innerHTML =
-          '<p class="text-dim" style="font-size:13px;">No announcement published.</p>';
+        const box = document.getElementById('ovLegacyAnn');
+        if (box) box.innerHTML = '<p class="text-dim" style="font-size:13px;">No announcement.</p>';
+      }
+
+      // Fenrir side
+      const fenEv = state.fenrirCurrentEvent;
+      const fenStatus = state.fenrirSessionStatus || 'offline';
+      applyStatusBadge(
+        document.getElementById('ovFenrirBadge'),
+        document.getElementById('ovFenrirText'),
+        null,
+        fenStatus
+      );
+      setTxt('ovFenrirName', fenEv ? fenEv.name : '—');
+      setTxt('ovFenrirWhen', fenEv
+        ? formatDateDisplay(fenEv.event_date) + ' · ' + formatTime(fenEv.event_time)
+        : '—');
+      setTxt('ovFenrirLast', state.fenrirLastMeet ? state.fenrirLastMeet.name : '—');
+
+      if (state.fenrirAnnouncement) {
+        const box = document.getElementById('ovFenrirAnn');
+        if (box) box.innerHTML =
+          '<div style="font-weight:600;margin-bottom:4px;">' + escapeHtml(state.fenrirAnnouncement.title || '') + '</div>' +
+          '<p style="font-size:13px;color:var(--text-muted);">' + escapeHtml(state.fenrirAnnouncement.message || '') + '</p>';
+      } else {
+        const box = document.getElementById('ovFenrirAnn');
+        if (box) box.innerHTML = '<p class="text-dim" style="font-size:13px;">No announcement.</p>';
+      }
+
+      // Also keep control panels in sync if mounted
+      refreshLegacyControl();
+      refreshFenrirControl();
+    }
+
+    /** Server Legacy control panel (former dashboard UI) */
+    function refreshLegacyControl() {
+      const ev = state.currentEvent;
+      const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+      set('dashNextName', ev ? ev.name : '—');
+      set('dashNextWhen', ev ? formatDateDisplay(ev.event_date) + ' · ' + formatTime(ev.event_time) : '—');
+      set('dashHost', (ev && ev.host) || '—');
+      set('dashEventName', ev ? ev.name : 'No event');
+      set('dashDate', ev ? String(ev.event_date).slice(0, 10).split('-').reverse().join('/') : '—');
+      set('dashTime', ev ? formatTime(ev.event_time) : '—');
+      set('dashTz', (ev && ev.timezone) || 'America/Sao_Paulo');
+      set('dashDesc', (ev && ev.description) || '');
+
+      setBanner(document.getElementById('dashBanner'), ev && ev.image_url, 'BANNER · EVENT IMAGE');
+      const pb = document.getElementById('previewBanner');
+      if (ev && ev.image_url) {
+        if (pb) pb.innerHTML = '<img src="' + escapeAttr(ev.image_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />';
+      } else if (pb) {
+        pb.textContent = 'BANNER';
+      }
+
+      set('previewName', ev ? ev.name : '—');
+      set('previewDesc', (ev && ev.description) || '');
+      set('previewMeta', 'HOST · ' + ((ev && ev.host) || '—').toUpperCase());
+
+      applyStatusBadge(
+        document.getElementById('dashStatusBadge'),
+        document.getElementById('dashStatusText'),
+        document.getElementById('previewStatus'),
+        state.sessionStatus || 'offline'
+      );
+
+      if (state.lastMeet) {
+        set('dashLastMeet', state.lastMeet.name);
+        set('dashLastWhen', formatDateDisplay(state.lastMeet.event_date) + ' · ' + formatTime(state.lastMeet.event_time));
+      } else {
+        set('dashLastMeet', '—');
+        set('dashLastWhen', 'No completed session yet');
+      }
+
+      const ann = document.getElementById('dashAnnouncement');
+      if (ann) {
+        if (state.announcement) {
+          ann.innerHTML =
+            '<div style="font-family:var(--font-display); font-size:13px; font-weight:600; margin-bottom:4px;">' +
+            escapeHtml(state.announcement.title || '') + '</div>' +
+            '<p style="font-size:13px; color:var(--text-muted);">' +
+            escapeHtml(state.announcement.message || '') + '</p>';
+        } else {
+          ann.innerHTML = '<p class="text-dim" style="font-size:13px;">No announcement published.</p>';
+        }
       }
 
       updateCountdown();
     }
 
-    function updateStatusUI(status) {
-      const badge = document.getElementById('dashStatusBadge');
-      const text = document.getElementById('dashStatusText');
-      const prev = document.getElementById('previewStatus');
-      badge.className = 'badge';
-      if (status === 'active') {
-        badge.classList.add('badge-active');
-        badge.textContent = '🟢 SESSION ACTIVE';
-        text.textContent = 'Session is live now.';
-        prev.textContent = '🟢 SESSION ACTIVE';
-        prev.style.color = 'var(--green)';
-      } else if (status === 'starting_soon') {
-        badge.classList.add('badge-soon');
-        badge.textContent = '🟡 STARTING SOON';
-        text.textContent = 'The next Bovary session is scheduled.';
-        prev.textContent = '🟡 STARTING SOON';
-        prev.style.color = 'var(--yellow)';
+    /** Fenrir control panel — same model as Legacy */
+    function refreshFenrirControl() {
+      const ev = state.fenrirCurrentEvent;
+      const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+      set('fenNextName', ev ? ev.name : '—');
+      set('fenNextWhen', ev ? formatDateDisplay(ev.event_date) + ' · ' + formatTime(ev.event_time) : '—');
+      set('fenHost', (ev && ev.host) || '—');
+      set('fenEventName', ev ? ev.name : 'No event');
+      set('fenDate', ev ? String(ev.event_date).slice(0, 10).split('-').reverse().join('/') : '—');
+      set('fenTime', ev ? formatTime(ev.event_time) : '—');
+      set('fenTz', (ev && ev.timezone) || 'America/Sao_Paulo');
+      set('fenDesc', (ev && ev.description) || '');
+
+      setBanner(document.getElementById('fenBanner'), ev && ev.image_url, 'BANNER · EVENT IMAGE');
+      const pb = document.getElementById('fenPreviewBanner');
+      if (ev && ev.image_url) {
+        if (pb) pb.innerHTML = '<img src="' + escapeAttr(ev.image_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />';
+      } else if (pb) {
+        pb.textContent = 'BANNER';
+      }
+
+      set('fenPreviewName', ev ? ev.name : '—');
+      set('fenPreviewDesc', (ev && ev.description) || '');
+      set('fenPreviewMeta', 'HOST · ' + ((ev && ev.host) || '—').toUpperCase());
+
+      applyStatusBadge(
+        document.getElementById('fenStatusBadge'),
+        document.getElementById('fenStatusText'),
+        document.getElementById('fenPreviewStatus'),
+        state.fenrirSessionStatus || 'offline'
+      );
+
+      if (state.fenrirLastMeet) {
+        set('fenLastMeet', state.fenrirLastMeet.name);
+        set('fenLastWhen', formatDateDisplay(state.fenrirLastMeet.event_date) + ' · ' + formatTime(state.fenrirLastMeet.event_time));
       } else {
-        badge.classList.add('badge-offline');
-        badge.textContent = '⚫ OFFLINE';
-        text.textContent = 'No active session.';
-        prev.textContent = '⚫ NO ACTIVE SESSION';
-        prev.style.color = 'var(--text-dim)';
+        set('fenLastMeet', '—');
+        set('fenLastWhen', 'No completed session yet');
+      }
+
+      const ann = document.getElementById('fenAnnouncementBox');
+      if (ann) {
+        if (state.fenrirAnnouncement) {
+          ann.innerHTML =
+            '<div style="font-family:var(--font-display); font-size:13px; font-weight:600; margin-bottom:4px;">' +
+            escapeHtml(state.fenrirAnnouncement.title || '') + '</div>' +
+            '<p style="font-size:13px; color:var(--text-muted);">' +
+            escapeHtml(state.fenrirAnnouncement.message || '') + '</p>';
+        } else {
+          ann.innerHTML = '<p class="text-dim" style="font-size:13px;">No announcement published.</p>';
+        }
+      }
+
+      updateFenrirCountdown();
+    }
+
+    function updateStatusUI(status) {
+      applyStatusBadge(
+        document.getElementById('dashStatusBadge'),
+        document.getElementById('dashStatusText'),
+        document.getElementById('previewStatus'),
+        status
+      );
+    }
+
+
+    // ---------- Auto-end sessions (panel-side, no app changes) ----------
+    const AUTO_END_STORAGE_KEY = 'bovary_auto_end_hours';
+    const DEFAULT_AUTO_END_HOURS = 5;
+    let autoEndTimer = null;
+    let autoEndRunning = false;
+
+    function loadAutoEndMap() {
+      try {
+        return JSON.parse(localStorage.getItem(AUTO_END_STORAGE_KEY) || '{}') || {};
+      } catch (_) {
+        return {};
       }
     }
 
-    async function startSession() {
-      if (!state.currentEvent || !supabaseClient) {
-        alert('No event selected or not connected.');
-        return;
-      }
-      const id = state.currentEvent.id;
-      const { error } = await supabaseClient
-        .from('events')
-        .update({ status: 'active', updated_at: new Date().toISOString() })
-        .eq('id', id);
-      if (error) {
-        alert('Failed to start session: ' + error.message);
-        return;
-      }
-      state.sessionStatus = 'active';
-      state.currentEvent.status = 'active';
-      updateStatusUI('active');
-      logLine('SESSION: STARTED · ' + state.currentEvent.name);
-      await loadEvents();
-      refreshDashboard();
-      renderEventLists();
+    function setStoredAutoEndHours(table, id, hours) {
+      const map = loadAutoEndMap();
+      map[table + ':' + id] = hours;
+      localStorage.setItem(AUTO_END_STORAGE_KEY, JSON.stringify(map));
     }
 
-    async function endSession() {
-      if (!state.currentEvent || !supabaseClient) {
-        alert('No event selected or not connected.');
-        return;
-      }
-      const id = state.currentEvent.id;
-      const { error } = await supabaseClient
-        .from('events')
-        .update({ status: 'ended', updated_at: new Date().toISOString() })
-        .eq('id', id);
-      if (error) {
-        alert('Failed to end session: ' + error.message);
-        return;
-      }
-      logLine('SESSION: ENDED · LAST MEET UPDATED');
-      await loadEvents();
-      refreshDashboard();
-      renderEventLists();
+    function getStoredAutoEndHours(table, id) {
+      const map = loadAutoEndMap();
+      const v = map[table + ':' + id];
+      if (v != null && !isNaN(v)) return Number(v);
+      return DEFAULT_AUTO_END_HOURS;
     }
+
+    function resolveAutoEndHours(table, ev) {
+      if (ev && ev.auto_end_hours != null && !isNaN(Number(ev.auto_end_hours))) {
+        return Math.max(1, Math.min(48, Number(ev.auto_end_hours)));
+      }
+      if (ev && ev.id != null) return getStoredAutoEndHours(table, ev.id);
+      return DEFAULT_AUTO_END_HOURS;
+    }
+
+    function eventEndDeadline(ev, table) {
+      const start = eventStartDate(ev);
+      if (!start) return null;
+      const hours = resolveAutoEndHours(table, ev);
+      return new Date(start.getTime() + hours * 60 * 60 * 1000);
+    }
+
+    async function checkAndAutoEndSessions() {
+      if (!supabaseClient || !state.authenticated || autoEndRunning) return;
+      autoEndRunning = true;
+      try {
+        const now = Date.now();
+        const tasks = [];
+
+        (state.events || []).forEach(ev => {
+          if (ev.status !== 'active' && ev.status !== 'starting_soon') return;
+          const deadline = eventEndDeadline(ev, 'events');
+          if (!deadline) return;
+          // Only auto-end if past start AND past deadline
+          const start = eventStartDate(ev);
+          if (!start || now < start.getTime()) return;
+          if (now >= deadline.getTime()) {
+            tasks.push({ table: 'events', id: ev.id, name: ev.name, hours: resolveAutoEndHours('events', ev) });
+          }
+        });
+
+        (state.fenrirEvents || []).forEach(ev => {
+          if (ev.status !== 'active' && ev.status !== 'starting_soon') return;
+          const deadline = eventEndDeadline(ev, 'fenrir_events');
+          if (!deadline) return;
+          const start = eventStartDate(ev);
+          if (!start || now < start.getTime()) return;
+          if (now >= deadline.getTime()) {
+            tasks.push({ table: 'fenrir_events', id: ev.id, name: ev.name, hours: resolveAutoEndHours('fenrir_events', ev) });
+          }
+        });
+
+        for (const t of tasks) {
+          logLine('AUTO-END · ' + t.name + ' · after ' + t.hours + 'h from start');
+          // skipConfirm + no push
+          await setEventStatus(t.table, t.id, 'ended', { skipConfirm: true, fromAutoEnd: true });
+          toast('Auto-ended', t.name + ' (after ' + t.hours + 'h)', 'warn');
+        }
+      } finally {
+        autoEndRunning = false;
+      }
+    }
+
+    function startAutoEndWatcher() {
+      if (autoEndTimer) clearInterval(autoEndTimer);
+      checkAndAutoEndSessions();
+      autoEndTimer = setInterval(checkAndAutoEndSessions, 30000); // every 30s
+    }
+
+
+    async function setEventStatus(table, id, newStatus, opts) {
+      opts = opts || {};
+      if (!supabaseClient) {
+        toast('Not connected', 'Configure Supabase first.', 'err');
+        return false;
+      }
+      if (!id) {
+        toast('No event', 'Select or create an event first.', 'warn');
+        return false;
+      }
+
+      const isFenrir = table === 'fenrir_events';
+      const list = isFenrir ? state.fenrirEvents : state.events;
+      const ev = list.find(e => e.id === id);
+      const name = ev ? ev.name : ('#' + id);
+
+      if (newStatus === 'ended' && !opts.skipConfirm) {
+        if (!confirm('End session "' + name + '"?\n\nStatus → ended. Banner is KEPT for Last Meet.')) {
+          return false;
+        }
+      }
+
+      // Only update status (+ updated_at). Never clear image_url.
+      const { error } = await supabaseClient
+        .from(table)
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) {
+        toast('Status update failed', error.message, 'err');
+        return false;
+      }
+
+      const labels = {
+        active: 'SESSION STARTED',
+        starting_soon: 'MARKED STARTING SOON',
+        ended: 'SESSION ENDED · LAST MEET',
+        scheduled: 'RESET TO SCHEDULED'
+      };
+      logLine((isFenrir ? 'FENRIR · ' : '') + (labels[newStatus] || newStatus) + ' · ' + name);
+      toast(labels[newStatus] || 'Updated', name, newStatus === 'ended' ? 'warn' : 'ok');
+
+      if (isFenrir) {
+        await loadFenrirEvents();
+        renderFenrirEventLists();
+        refreshFenrirControl();
+        refreshDashboard();
+      } else {
+        await loadEvents();
+        renderEventLists();
+        refreshLegacyControl();
+        refreshDashboard();
+      }
+
+      // Optional push on START
+      if (newStatus === 'active' && shouldSendPushOnStart(isFenrir)) {
+        const target = isFenrir ? 'fivem' : 'legacy';
+        await sendPushNotification({
+          title: '🟢 BOVARY NOW — SESSION ACTIVE',
+          body: (name || 'Session') + ' is live now. Open Bovary Now.',
+          target: target
+        });
+      }
+      return true;
+    }
+
+    function shouldSendPushOnStart(isFenrir) {
+      if (isFenrir) {
+        const el = document.getElementById('fenPushOnStart');
+        if (el) return !!el.checked;
+      } else {
+        const el = document.getElementById('dashPushOnStart');
+        if (el) return !!el.checked;
+      }
+      return !!state.pushOnStart;
+    }
+
+    function setCurrentStatus(newStatus) {
+      if (!state.currentEvent) {
+        toast('No current event', 'Create or schedule an event first.', 'warn');
+        return;
+      }
+      return setEventStatus('events', state.currentEvent.id, newStatus);
+    }
+
+    function setFenrirCurrentStatus(newStatus) {
+      if (!state.fenrirCurrentEvent) {
+        toast('No current Fenrir event', 'Create or schedule a Fenrir event first.', 'warn');
+        return;
+      }
+      return setEventStatus('fenrir_events', state.fenrirCurrentEvent.id, newStatus);
+    }
+
+    // Back-compat aliases
+    async function startSession() { return setCurrentStatus('active'); }
+    async function endSession() { return setCurrentStatus('ended'); }
 
     // ---------- Countdown ----------
     let countdownTimer = null;
@@ -2072,30 +2765,47 @@
       return new Date(parts[0], parts[1] - 1, parts[2], tp[0], tp[1], 0);
     }
 
-    function updateCountdown() {
-      const target = getEventDateTime();
-      const el = document.getElementById('dashCountdown');
-      const prev = document.getElementById('previewCountdown');
-      if (!el || !prev) return;
-      if (!target || state.sessionStatus === 'active') {
-        const label = state.sessionStatus === 'active' ? 'LIVE' : '--:--:--';
-        el.textContent = label;
-        prev.textContent = label;
-        return;
-      }
+    function formatCountdownDiff(target) {
+      if (!target) return '--:--:--';
       const now = new Date();
-      let diff = Math.floor((target - now) / 1000);
-      if (diff <= 0) {
-        el.textContent = '00:00:00';
-        prev.textContent = '00:00:00';
-        return;
+      let diff = Math.floor((target.getTime() - now.getTime()) / 1000);
+      if (diff < 0) {
+        if (diff > -4 * 3600) return 'LIVE';
+        return '--:--:--';
       }
       const h = Math.floor(diff / 3600);
       const m = Math.floor((diff % 3600) / 60);
       const s = diff % 60;
-      const str = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-      el.textContent = str;
-      prev.textContent = str;
+      const pad = n => String(n).padStart(2, '0');
+      return pad(h) + ':' + pad(m) + ':' + pad(s);
+    }
+
+    function updateCountdown() {
+      const target = getEventDateTime();
+      const label = formatCountdownDiff(target);
+      const el = document.getElementById('dashCountdown');
+      const prev = document.getElementById('previewCountdown');
+      if (el) el.textContent = label;
+      if (prev) prev.textContent = label;
+    }
+
+    function getFenrirEventDateTime() {
+      const ev = state.fenrirCurrentEvent;
+      if (!ev) return null;
+      const d = String(ev.event_date).slice(0, 10);
+      const t = formatTime(ev.event_time);
+      const parts = d.split('-').map(Number);
+      const tp = t.split(':').map(Number);
+      return new Date(parts[0], parts[1] - 1, parts[2], tp[0], tp[1], 0);
+    }
+
+    function updateFenrirCountdown() {
+      const target = getFenrirEventDateTime();
+      const label = formatCountdownDiff(target);
+      const el = document.getElementById('fenCountdown');
+      const prev = document.getElementById('fenPreviewCountdown');
+      if (el) el.textContent = label;
+      if (prev) prev.textContent = label;
     }
 
     function startCountdownTicker() {
@@ -2115,6 +2825,7 @@
       document.getElementById('evHost').value = 'Bovary Staff';
       document.getElementById('evTz').value = 'America/Sao_Paulo';
       document.getElementById('evStatus').value = 'scheduled';
+      document.getElementById('evAutoEndHours').value = '5';
       document.getElementById('evImage').value = '';
       const bf = document.getElementById('evBannerFile');
       if (bf) bf.value = '';
@@ -2123,7 +2834,7 @@
 
     function openEditEvent(id) {
       state.eventTargetTable = 'events';
-      const ev = id
+      const ev = (id !== undefined && id !== null)
         ? state.events.find(e => e.id === id)
         : state.currentEvent;
       if (!ev) return openCreateEvent();
@@ -2136,6 +2847,9 @@
       document.getElementById('evHost').value = ev.host || '';
       document.getElementById('evTz').value = ev.timezone || 'America/Sao_Paulo';
       document.getElementById('evStatus').value = ev.status || 'scheduled';
+      document.getElementById('evAutoEndHours').value = String(
+        (ev.auto_end_hours != null ? ev.auto_end_hours : getStoredAutoEndHours('events', ev.id)) || 5
+      );
       document.getElementById('evImage').value = ev.image_url || '';
       const bf2 = document.getElementById('evBannerFile');
       if (bf2) bf2.value = '';
@@ -2172,27 +2886,44 @@
         async function saveEvent(e) {
       e.preventDefault();
       if (!supabaseClient) {
-        alert('Not connected to Supabase.');
+        toast('Not connected', 'Configure Supabase first.', 'err');
         return false;
       }
 
       const table = state.eventTargetTable === 'fenrir_events' ? 'fenrir_events' : 'events';
       const isFenrir = table === 'fenrir_events';
 
+      const name = document.getElementById('evName').value.trim();
+      const eventDate = document.getElementById('evDate').value;
+      const eventTime = document.getElementById('evTime').value;
+      if (!name) {
+        toast('Validation', 'Event name is required.', 'warn');
+        document.getElementById('evName').focus();
+        return false;
+      }
+      if (!eventDate || !eventTime) {
+        toast('Validation', 'Date and time are required.', 'warn');
+        return false;
+      }
+
       let imageUrl = document.getElementById('evImage').value.trim() || null;
       try {
         const uploaded = await uploadBannerIfNeeded();
         if (uploaded) imageUrl = uploaded;
       } catch (upErr) {
-        alert('Banner upload failed: ' + (upErr.message || upErr));
+        toast('Banner upload failed', upErr.message || String(upErr), 'err');
         return false;
       }
 
+      let autoEndHours = parseInt(document.getElementById('evAutoEndHours').value, 10);
+      if (!autoEndHours || autoEndHours < 1) autoEndHours = 5;
+      if (autoEndHours > 48) autoEndHours = 48;
+
       const payload = {
-        name: document.getElementById('evName').value.trim(),
+        name: name,
         description: document.getElementById('evDesc').value.trim(),
-        event_date: document.getElementById('evDate').value,
-        event_time: document.getElementById('evTime').value,
+        event_date: eventDate,
+        event_time: eventTime,
         host: document.getElementById('evHost').value.trim(),
         timezone: document.getElementById('evTz').value,
         status: document.getElementById('evStatus').value,
@@ -2200,38 +2931,67 @@
         updated_at: new Date().toISOString()
       };
 
+      // Optional DB column — if migration not applied, insert/update without it
+      const payloadWithAuto = Object.assign({}, payload, { auto_end_hours: autoEndHours });
+
       const editId = isFenrir ? state.editingFenrirEventId : state.editingEventId;
 
       let error;
+      let savedId = editId;
       if (editId) {
         ({ error } = await supabaseClient
           .from(table)
-          .update(payload)
+          .update(payloadWithAuto)
           .eq('id', editId));
+        if (error && /auto_end_hours/i.test(error.message || '')) {
+          ({ error } = await supabaseClient
+            .from(table)
+            .update(payload)
+            .eq('id', editId));
+        }
       } else {
-        ({ error } = await supabaseClient
+        let data;
+        ({ data, error } = await supabaseClient
           .from(table)
-          .insert([payload]));
+          .insert([payloadWithAuto])
+          .select('id')
+          .maybeSingle());
+        if (error && /auto_end_hours/i.test(error.message || '')) {
+          ({ data, error } = await supabaseClient
+            .from(table)
+            .insert([payload])
+            .select('id')
+            .maybeSingle());
+        }
+        if (data && data.id) savedId = data.id;
       }
 
       if (error) {
-        alert('Save failed: ' + error.message);
+        toast('Save failed', error.message, 'err');
         return false;
+      }
+
+      if (savedId) {
+        setStoredAutoEndHours(table, savedId, autoEndHours);
       }
 
       const fileInput = document.getElementById('evBannerFile');
       if (fileInput) fileInput.value = '';
 
       closeEventModal();
-      logLine((isFenrir ? 'FENRIR EVENT SAVED: ' : 'EVENT SAVED: ') + payload.name);
+      logLine((isFenrir ? 'FENRIR EVENT SAVED: ' : 'EVENT SAVED: ') + payload.name + ' · auto-end ' + autoEndHours + 'h');
+      toast('Event saved', payload.name + ' · ends after ' + autoEndHours + 'h', 'ok');
 
       if (isFenrir) {
         await loadFenrirEvents();
         renderFenrirEventLists();
+        refreshFenrirControl();
+        refreshDashboard();
       } else {
         await loadEvents();
-        refreshDashboard();
         renderEventLists();
+        refreshLegacyControl();
+        refreshDashboard();
       }
       return false;
     }
@@ -2244,10 +3004,11 @@
 
       const { error } = await supabaseClient.from('events').delete().eq('id', targetId);
       if (error) {
-        alert('Delete failed: ' + error.message);
+        toast('Delete failed', error.message, 'err');
         return;
       }
       logLine('EVENT DELETED');
+      toast('Event deleted', '', 'warn');
       await loadEvents();
       refreshDashboard();
       renderEventLists();
@@ -2264,19 +3025,35 @@
       if (!upcoming.length) {
         upEl.innerHTML = '<div class="empty-state"><p>No upcoming events.</p></div>';
       } else {
-        upEl.innerHTML = upcoming.map(ev => `
+        upEl.innerHTML = upcoming.map(ev => {
+          const st = ev.status || 'scheduled';
+          const actions = [];
+          if (st !== 'starting_soon' && st !== 'active') {
+            actions.push(`<button class="btn btn-sm btn-warn" onclick="setEventStatus('events', ${ev.id}, 'starting_soon')">SOON</button>`);
+          }
+          if (st !== 'active') {
+            actions.push(`<button class="btn btn-sm btn-success" onclick="setEventStatus('events', ${ev.id}, 'active')">START</button>`);
+          }
+          if (st === 'active' || st === 'starting_soon') {
+            actions.push(`<button class="btn btn-sm btn-danger" onclick="setEventStatus('events', ${ev.id}, 'ended')">END</button>`);
+          }
+          if (st !== 'scheduled') {
+            actions.push(`<button class="btn btn-sm btn-ghost" onclick="setEventStatus('events', ${ev.id}, 'scheduled')">CANCEL</button>`);
+          }
+          actions.push(`<button class="btn btn-sm" onclick="openEditEvent(${ev.id})">EDIT</button>`);
+          actions.push(`<button class="btn btn-sm btn-danger" onclick="confirmDeleteEvent(${ev.id})">DELETE</button>`);
+          return `
           <div class="event-row">
             <div>
               <div class="event-row-name">${escapeHtml(ev.name)}</div>
               <div class="event-row-meta">${formatDateDisplay(ev.event_date)} · ${formatTime(ev.event_time)} · ${escapeHtml(ev.host || '')} · ${escapeHtml(ev.timezone || '')}</div>
             </div>
-            <span class="badge badge-scheduled">${escapeHtml((ev.status || 'scheduled').toUpperCase())}</span>
-            <div class="event-row-actions">
-              <button class="btn btn-sm" onclick="openEditEvent(${ev.id})">EDIT</button>
-              <button class="btn btn-sm btn-danger" onclick="confirmDeleteEvent(${ev.id})">DELETE</button>
+            <span class="badge ${statusBadgeClass(st)}">${statusLabel(st)}</span>
+            <div class="event-row-actions status-actions">
+              ${actions.join('')}
             </div>
-          </div>
-        `).join('');
+          </div>`;
+        }).join('');
       }
 
       if (!completed.length) {
@@ -2289,13 +3066,16 @@
               <div class="event-row-meta">${formatDateDisplay(ev.event_date)} · ${formatTime(ev.event_time)} · ${escapeHtml(ev.host || '')}</div>
             </div>
             <span class="badge badge-offline">ENDED</span>
-            <div class="event-row-actions">
-              <button class="btn btn-sm" onclick="openEditEvent(${ev.id})">VIEW</button>
+            <div class="event-row-actions status-actions">
+              <button class="btn btn-sm" onclick="openEditEvent(${ev.id})">EDIT</button>
+              <button class="btn btn-sm btn-ghost" onclick="setEventStatus('events', ${ev.id}, 'scheduled')">REOPEN</button>
+              <button class="btn btn-sm btn-danger" onclick="confirmDeleteEvent(${ev.id})">DELETE</button>
             </div>
           </div>
         `).join('');
       }
     }
+
 
     // ---------- Announcements ----------
     function fillAnnouncementForm() {
@@ -2309,7 +3089,7 @@
     async function publishAnnouncement(e) {
       e.preventDefault();
       if (!supabaseClient) {
-        alert('Not connected to Supabase.');
+        toast('Not connected', 'Configure Supabase first.', 'err');
         return false;
       }
       const title = document.getElementById('annTitle').value.trim();
@@ -2323,7 +3103,7 @@
         .insert([{ title, message }]);
 
       if (error) {
-        alert('Publish failed: ' + error.message + '\n\nIf this is a policy error, add admin INSERT/DELETE policies on public.announcements in Supabase.');
+        toast('Publish failed', error.message, 'err');
         return false;
       }
 
@@ -2332,6 +3112,7 @@
       document.getElementById('annPreviewMsg').textContent = message || 'No announcement published.';
       refreshDashboard();
       logLine('ANNOUNCEMENT PUBLISHED');
+      toast('Announcement published', '', 'ok');
       return false;
     }
 
@@ -2339,7 +3120,7 @@
       if (!supabaseClient) return;
       const { error } = await supabaseClient.from('announcements').delete().neq('id', 0);
       if (error) {
-        alert('Remove failed: ' + error.message);
+        toast('Remove failed', error.message, 'err');
         return;
       }
       state.announcement = null;
@@ -2416,13 +3197,6 @@
       while (log.children.length > 14) log.removeChild(log.firstChild);
     }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
 
     function escapeAttr(str) {
       return escapeHtml(str).replace(/'/g, '&#39;');
@@ -2476,6 +3250,7 @@
         logLine('WARN: FENRIR EVENTS ' + error.message);
         state.fenrirEvents = [];
         state.fenrirCurrentEvent = null;
+        state.fenrirSessionStatus = 'offline';
         state.fenrirLastMeet = null;
         return;
       }
@@ -2487,6 +3262,12 @@
       const ended = state.fenrirEvents.filter(e => e.status === 'ended');
 
       state.fenrirCurrentEvent = active || soon || scheduled[0] || null;
+      if (active) state.fenrirSessionStatus = 'active';
+      else if (soon || (state.fenrirCurrentEvent && state.fenrirCurrentEvent.status === 'starting_soon'))
+        state.fenrirSessionStatus = 'starting_soon';
+      else if (state.fenrirCurrentEvent) state.fenrirSessionStatus = 'scheduled';
+      else state.fenrirSessionStatus = 'offline';
+
       state.fenrirLastMeet = ended.length
         ? ended.sort((a, b) => String(b.event_date + b.event_time).localeCompare(String(a.event_date + a.event_time)))[0]
         : null;
@@ -2520,21 +3301,35 @@
       if (!upcoming.length) {
         upEl.innerHTML = '<div class="empty-state"><p>No Fenrir events yet.</p></div>';
       } else {
-        upEl.innerHTML = upcoming.map(ev => `
+        upEl.innerHTML = upcoming.map(ev => {
+          const st = ev.status || 'scheduled';
+          const actions = [];
+          if (st !== 'starting_soon' && st !== 'active') {
+            actions.push(`<button class="btn btn-sm btn-warn" onclick="setEventStatus('fenrir_events', ${ev.id}, 'starting_soon')">SOON</button>`);
+          }
+          if (st !== 'active') {
+            actions.push(`<button class="btn btn-sm btn-success" onclick="setEventStatus('fenrir_events', ${ev.id}, 'active')">START</button>`);
+          }
+          if (st === 'active' || st === 'starting_soon') {
+            actions.push(`<button class="btn btn-sm btn-danger" onclick="setEventStatus('fenrir_events', ${ev.id}, 'ended')">END</button>`);
+          }
+          if (st !== 'scheduled') {
+            actions.push(`<button class="btn btn-sm btn-ghost" onclick="setEventStatus('fenrir_events', ${ev.id}, 'scheduled')">CANCEL</button>`);
+          }
+          actions.push(`<button class="btn btn-sm" onclick="openEditFenrirEvent(${ev.id})">EDIT</button>`);
+          actions.push(`<button class="btn btn-sm btn-danger" onclick="confirmDeleteFenrirEvent(${ev.id})">DELETE</button>`);
+          return `
           <div class="event-row">
             <div>
               <div class="event-row-name">${escapeHtml(ev.name)}</div>
               <div class="event-row-meta">${formatDateDisplay(ev.event_date)} · ${formatTime(ev.event_time)} · ${escapeHtml(ev.host || '')} · ${escapeHtml(ev.timezone || '')}</div>
             </div>
-            <span class="badge badge-scheduled">${escapeHtml((ev.status || 'scheduled').toUpperCase())}</span>
-            <div class="event-row-actions">
-              <button class="btn btn-sm" onclick="openEditFenrirEvent(${ev.id})">EDIT</button>
-              ${ev.status !== 'active' ? `<button class="btn btn-sm" onclick="startFenrirSession(${ev.id})">START</button>` : ''}
-              ${ev.status === 'active' || ev.status === 'starting_soon' ? `<button class="btn btn-sm" onclick="endFenrirSession(${ev.id})">END</button>` : ''}
-              <button class="btn btn-sm btn-danger" onclick="confirmDeleteFenrirEvent(${ev.id})">DELETE</button>
+            <span class="badge ${statusBadgeClass(st)}">${statusLabel(st)}</span>
+            <div class="event-row-actions status-actions">
+              ${actions.join('')}
             </div>
-          </div>
-        `).join('');
+          </div>`;
+        }).join('');
       }
 
       if (!completed.length) {
@@ -2547,13 +3342,16 @@
               <div class="event-row-meta">${formatDateDisplay(ev.event_date)} · ${formatTime(ev.event_time)} · ${escapeHtml(ev.host || '')}</div>
             </div>
             <span class="badge badge-offline">ENDED</span>
-            <div class="event-row-actions">
-              <button class="btn btn-sm" onclick="openEditFenrirEvent(${ev.id})">VIEW</button>
+            <div class="event-row-actions status-actions">
+              <button class="btn btn-sm" onclick="openEditFenrirEvent(${ev.id})">EDIT</button>
+              <button class="btn btn-sm btn-ghost" onclick="setEventStatus('fenrir_events', ${ev.id}, 'scheduled')">REOPEN</button>
+              <button class="btn btn-sm btn-danger" onclick="confirmDeleteFenrirEvent(${ev.id})">DELETE</button>
             </div>
           </div>
         `).join('');
       }
     }
+
 
     function openCreateFenrirEvent() {
       state.eventTargetTable = 'fenrir_events';
@@ -2566,6 +3364,7 @@
       document.getElementById('evHost').value = 'Fenrir Staff';
       document.getElementById('evTz').value = 'America/Sao_Paulo';
       document.getElementById('evStatus').value = 'scheduled';
+      document.getElementById('evAutoEndHours').value = '5';
       document.getElementById('evImage').value = '';
       const bf = document.getElementById('evBannerFile');
       if (bf) bf.value = '';
@@ -2574,7 +3373,12 @@
 
     function openEditFenrirEvent(id) {
       state.eventTargetTable = 'fenrir_events';
-      const ev = state.fenrirEvents.find(e => e.id === id);
+      let ev = null;
+      if (id != null && id !== undefined) {
+        ev = state.fenrirEvents.find(e => e.id === id);
+      } else {
+        ev = state.fenrirCurrentEvent;
+      }
       if (!ev) return openCreateFenrirEvent();
       state.editingFenrirEventId = ev.id;
       document.getElementById('eventModalTitle').textContent = 'EDIT FENRIR EVENT';
@@ -2585,6 +3389,9 @@
       document.getElementById('evHost').value = ev.host || '';
       document.getElementById('evTz').value = ev.timezone || 'America/Sao_Paulo';
       document.getElementById('evStatus').value = ev.status || 'scheduled';
+      document.getElementById('evAutoEndHours').value = String(
+        (ev.auto_end_hours != null ? ev.auto_end_hours : getStoredAutoEndHours('fenrir_events', ev.id)) || 5
+      );
       document.getElementById('evImage').value = ev.image_url || '';
       const bf2 = document.getElementById('evBannerFile');
       if (bf2) bf2.value = '';
@@ -2592,61 +3399,25 @@
     }
 
     async function startFenrirSession(id) {
-      if (!supabaseClient) {
-        alert('Not connected to Supabase.');
-        return;
-      }
-      const targetId = id || (state.fenrirCurrentEvent && state.fenrirCurrentEvent.id);
-      if (!targetId) {
-        alert('No Fenrir event selected.');
-        return;
-      }
-      const { error } = await supabaseClient
-        .from('fenrir_events')
-        .update({ status: 'active', updated_at: new Date().toISOString() })
-        .eq('id', targetId);
-      if (error) {
-        alert('Failed to start Fenrir session: ' + error.message);
-        return;
-      }
-      logLine('FENRIR SESSION: STARTED · id ' + targetId);
-      await loadFenrirEvents();
-      renderFenrirEventLists();
+      return setEventStatus('fenrir_events', id, 'active');
     }
 
+
     async function endFenrirSession(id) {
-      if (!supabaseClient) {
-        alert('Not connected to Supabase.');
-        return;
-      }
-      const targetId = id || (state.fenrirCurrentEvent && state.fenrirCurrentEvent.id);
-      if (!targetId) {
-        alert('No Fenrir event selected.');
-        return;
-      }
-      // Only status → ended. Never clear image_url (Last Meet banner in app).
-      const { error } = await supabaseClient
-        .from('fenrir_events')
-        .update({ status: 'ended', updated_at: new Date().toISOString() })
-        .eq('id', targetId);
-      if (error) {
-        alert('Failed to end Fenrir session: ' + error.message);
-        return;
-      }
-      logLine('FENRIR SESSION: ENDED · LAST MEET UPDATED (banner kept)');
-      await loadFenrirEvents();
-      renderFenrirEventLists();
+      return setEventStatus('fenrir_events', id, 'ended');
     }
+
 
     async function confirmDeleteFenrirEvent(id) {
       if (!id || !supabaseClient) return;
       if (!confirm('Delete this Fenrir event permanently?')) return;
       const { error } = await supabaseClient.from('fenrir_events').delete().eq('id', id);
       if (error) {
-        alert('Delete failed: ' + error.message);
+        toast('Delete failed', error.message, 'err');
         return;
       }
       logLine('FENRIR EVENT DELETED · id ' + id);
+      toast('Fenrir event deleted', '', 'warn');
       await loadFenrirEvents();
       renderFenrirEventLists();
     }
@@ -2667,13 +3438,13 @@
     async function publishFenrirAnnouncement(e) {
       e.preventDefault();
       if (!supabaseClient) {
-        alert('Not connected to Supabase.');
+        toast('Not connected', 'Configure Supabase first.', 'err');
         return false;
       }
       const title = document.getElementById('fenrirAnnTitle').value.trim();
       const message = document.getElementById('fenrirAnnMessage').value.trim();
       if (!title && !message) {
-        alert('Title or message required.');
+        toast('Validation', 'Title or message required.', 'warn');
         return false;
       }
 
@@ -2684,10 +3455,11 @@
         .insert([{ title: title || null, message: message || null }]);
 
       if (error) {
-        alert('Publish failed: ' + error.message);
+        toast('Publish failed', error.message, 'err');
         return false;
       }
       logLine('FENRIR ANNOUNCEMENT PUBLISHED');
+      toast('Fenrir announcement published', '', 'ok');
       await loadFenrirAnnouncement();
       fillFenrirAnnouncementForm();
       return false;
@@ -2698,14 +3470,129 @@
       if (!confirm('Remove current Fenrir announcement?')) return;
       const { error } = await supabaseClient.from('fenrir_announcements').delete().neq('id', 0);
       if (error) {
-        alert('Remove failed: ' + error.message);
+        toast('Remove failed', error.message, 'err');
         return;
       }
       logLine('FENRIR ANNOUNCEMENT REMOVED');
+      toast('Announcement removed', '', 'warn');
       state.fenrirAnnouncement = null;
       fillFenrirAnnouncementForm();
     }
 
+
+    // ---------- Push notifications ----------
+    function fillPushTemplate(kind) {
+      const titleEl = document.getElementById('pushTitle');
+      const bodyEl = document.getElementById('pushBody');
+      if (!titleEl || !bodyEl) return;
+      const ev = state.currentEvent;
+      const name = ev ? ev.name : 'Session';
+      if (kind === 'active') {
+        titleEl.value = '🟢 BOVARY NOW — SESSION ACTIVE';
+        bodyEl.value = name + ' is live now. Open Bovary Now.';
+      } else if (kind === 'soon') {
+        titleEl.value = '🟡 BOVARY NOW — STARTING SOON';
+        bodyEl.value = name + ' starts soon. Get ready.';
+      }
+      updatePushPreview();
+    }
+
+    function updatePushPreview() {
+      const t = document.getElementById('pushTitle');
+      const b = document.getElementById('pushBody');
+      const pt = document.getElementById('pushPrevTitle');
+      const pb = document.getElementById('pushPrevBody');
+      if (pt) pt.textContent = (t && t.value.trim()) || 'Notification title';
+      if (pb) pb.textContent = (b && b.value.trim()) || 'Notification body preview';
+    }
+
+    async function sendPushManual(e) {
+      e.preventDefault();
+      const title = document.getElementById('pushTitle').value.trim();
+      const body = document.getElementById('pushBody').value.trim();
+      const target = document.getElementById('pushTarget').value;
+      if (!title || !body) {
+        toast('Validation', 'Title and body are required.', 'warn');
+        return false;
+      }
+      const btn = document.getElementById('btnSendPush');
+      if (btn) btn.classList.add('loading');
+      const result = await sendPushNotification({ title, body, target });
+      if (btn) btn.classList.remove('loading');
+      return false;
+    }
+
+    async function sendPushNotification({ title, body, target }) {
+      target = target || 'all';
+      const resultEl = document.getElementById('pushResult');
+      if (!supabaseClient) {
+        toast('Not connected', 'Login and configure Supabase.', 'err');
+        return null;
+      }
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session || !session.access_token) {
+          toast('Auth required', 'Re-login to send push.', 'err');
+          return null;
+        }
+        const { url } = getConfig();
+        const fnUrl = url.replace(/\/$/, '') + '/functions/v1/send-push';
+        const res = await fetch(fnUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+            'apikey': getConfig().anon
+          },
+          body: JSON.stringify({ title, body, target })
+        });
+        let payload = null;
+        try { payload = await res.json(); } catch (_) { payload = { raw: await res.text() }; }
+
+        if (!res.ok) {
+          const msg = (payload && (payload.error || payload.message)) || ('HTTP ' + res.status);
+          toast('Push failed', msg, 'err');
+          logLine('PUSH FAILED · ' + msg);
+          if (resultEl) {
+            resultEl.className = 'push-result visible';
+            resultEl.style.borderColor = 'rgba(248,113,113,0.5)';
+            resultEl.textContent = 'FAILED · ' + msg;
+          }
+          return null;
+        }
+
+        const targeted = payload.targeted ?? payload.Targeted ?? '?';
+        const delivered = payload.delivered ?? payload.Delivered ?? '?';
+        const failed = payload.failed ?? payload.Failed ?? '?';
+        const summary = 'Targeted: ' + targeted + ' · Delivered: ' + delivered + ' · Failed: ' + failed;
+        toast('Push sent', summary, 'ok');
+        logLine('PUSH SENT · ' + summary + ' · target=' + target);
+        if (resultEl) {
+          resultEl.className = 'push-result visible';
+          resultEl.style.borderColor = 'rgba(52,211,153,0.45)';
+          resultEl.textContent = 'OK · ' + summary;
+        }
+        return payload;
+      } catch (err) {
+        toast('Push error', err.message || String(err), 'err');
+        logLine('PUSH ERROR · ' + (err.message || err));
+        if (resultEl) {
+          resultEl.className = 'push-result visible';
+          resultEl.style.borderColor = 'rgba(248,113,113,0.5)';
+          resultEl.textContent = 'ERROR · ' + (err.message || err);
+        }
+        return null;
+      }
+    }
+
+
+    // Push preview live update
+    document.addEventListener('DOMContentLoaded', () => {
+      const t = document.getElementById('pushTitle');
+      const b = document.getElementById('pushBody');
+      if (t) t.addEventListener('input', updatePushPreview);
+      if (b) b.addEventListener('input', updatePushPreview);
+    });
 
   </script>
 </body>

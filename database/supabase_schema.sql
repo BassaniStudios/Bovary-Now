@@ -278,3 +278,16 @@ DROP POLICY IF EXISTS "fenrir_announcements_admin_all" ON public.fenrir_announce
 CREATE POLICY "fenrir_announcements_admin_all"
   ON public.fenrir_announcements FOR ALL TO authenticated
   USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- =========================================================
+-- AUTO-END HOURS (optional — admin panel auto-ends sessions)
+-- Run once in Supabase SQL Editor if you want the value stored in DB.
+-- App does not need this column; panel falls back to localStorage + default 5h.
+-- =========================================================
+
+ALTER TABLE public.events
+  ADD COLUMN IF NOT EXISTS auto_end_hours INTEGER NOT NULL DEFAULT 5;
+
+ALTER TABLE public.fenrir_events
+  ADD COLUMN IF NOT EXISTS auto_end_hours INTEGER NOT NULL DEFAULT 5;
+
