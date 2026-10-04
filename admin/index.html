@@ -1387,6 +1387,17 @@
             </div>
           </div>
 
+          <div class="card col-12" style="margin-bottom:12px;">
+            <div class="card-label">Quick Activity</div>
+            <p style="font-size:12px; color:var(--text-dim); margin-bottom:10px;">
+              Gera atividade no Supabase sem alterar o que o membro vê no app.
+            </p>
+            <div class="actions" style="flex-wrap:wrap; gap:8px;">
+              <button type="button" class="btn btn-primary btn-sm" onclick="adminPing()">PING · /ping</button>
+              <button type="button" class="btn btn-sm" onclick="silentAppPulse()">APP PULSE · silencioso</button>
+            </div>
+          </div>
+
           <div class="card">
             <div class="card-label">System Log</div>
             <div id="systemLog">
@@ -1877,9 +1888,47 @@
               <div class="terminal-line"><span class="cmd">&gt;</span> PROJECT: BovaryNow</div>
               <div class="terminal-line"><span class="cmd">&gt;</span> ORG: BovaryLikes</div>
               <div class="terminal-line"><span class="cmd">&gt;</span> ENV: PRODUCTION</div>
-              <div class="terminal-line"><span class="cmd">&gt;</span> PANEL VERSION: 0.3.0-design</div>
+              <div class="terminal-line"><span class="cmd">&gt;</span> PANEL VERSION: 0.3.2-ping</div>
               <div class="terminal-line mt-12"><span class="cmd">&gt;</span> IDENTITY: BOVARY CLUB SOCIETY // ADMIN CORE</div>
               <div class="terminal-line"><span class="cmd">&gt;</span> VISUAL: HUD / NEON / TERMINAL</div>
+            </div>
+
+            <div class="card col-12" id="activityCard">
+              <div class="card-label">Activity · Anti-Pause</div>
+              <p style="font-size:13px; color:var(--text-muted); line-height:1.65; margin-bottom:14px;">
+                Gera atividade no banco para evitar pausa do projeto Free por inatividade (~7 dias).
+                Rode o bloco <strong style="color:var(--text);">KEEP ALIVE</strong> do
+                <code style="color:var(--cyan);">database/supabase_schema.sql</code> uma vez no SQL Editor do Supabase.
+              </p>
+              <div class="grid" style="gap:12px;">
+                <div class="card col-6" style="padding:14px; background:var(--bg-elevated); border:1px solid var(--border);">
+                  <div class="card-label" style="margin-bottom:8px;">/ping · Admin heartbeat</div>
+                  <p style="font-size:12px; color:var(--text-dim); margin-bottom:12px; line-height:1.55;">
+                    Grava um heartbeat na tabela <code style="color:var(--cyan);">keepalive</code>.
+                    Não altera events, announcements nem nada visível no app.
+                  </p>
+                  <div class="actions" style="flex-wrap:wrap; gap:8px;">
+                    <button type="button" class="btn btn-primary" onclick="adminPing()">PING</button>
+                  </div>
+                  <div class="terminal-line mt-12" style="font-size:11px;">
+                    <span class="cmd">&gt;</span> LAST: <span id="pingLastStatus">—</span>
+                  </div>
+                </div>
+                <div class="card col-6" style="padding:14px; background:var(--bg-elevated); border:1px solid var(--border);">
+                  <div class="card-label" style="margin-bottom:8px;">App pulse · silencioso</div>
+                  <p style="font-size:12px; color:var(--text-dim); margin-bottom:12px; line-height:1.55;">
+                    Simula a abertura do app: lê as mesmas tabelas que o membro usa
+                    (events, announcements, fenrir) e registra um pulse oculto.
+                    <strong style="color:var(--text);">Nada muda na tela do app.</strong>
+                  </p>
+                  <div class="actions" style="flex-wrap:wrap; gap:8px;">
+                    <button type="button" class="btn btn-primary" onclick="silentAppPulse()">APP PULSE</button>
+                  </div>
+                  <div class="terminal-line mt-12" style="font-size:11px;">
+                    <span class="cmd">&gt;</span> LAST: <span id="pulseLastStatus">—</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="card col-12">
@@ -2088,6 +2137,7 @@
       if (page === 'fenrir-events') renderFenrirEventLists();
       if (page === 'fenrir-announcements') fillFenrirAnnouncementForm();
       if (page === 'notifications') updatePushPreview();
+      if (page === 'settings') refreshActivityStatus();
     }
 
     // ---------- Auth ----------
@@ -3143,7 +3193,141 @@
       }
     });
 
+    // ---------- Activity: PING + silent APP PULSE ----------
+    async function writeKeepalive(source, note) {
+      if (!supabaseClient) throw new Error('Not connected');
+      try {
+        const { data, error } = await supabaseClient.rpc('ping_keepalive', {
+          p_source: source,
+          p_note: note || null
+        });
+        if (error) throw error;
+        return data || new Date().toISOString();
+      } catch (rpcErr) {
+        // Fallback if RPC not installed yet
+        const ts = new Date().toISOString();
+        const { error: upErr } = await supabaseClient
+          .from('keepalive')
+          .upsert({
+            id: 1,
+            last_ping_at: ts,
+            source: source,
+            note: note || null,
+            updated_at: ts
+          }, { onConflict: 'id' });
+        if (upErr) throw upErr;
+        return ts;
+      }
+    }
+
+    function setActivityStatus(elId, text) {
+      const el = document.getElementById(elId);
+      if (el) el.textContent = text;
+    }
+
+    function formatTs(iso) {
+      if (!iso) return '—';
+      try {
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return String(iso);
+        return d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+      } catch (_) {
+        return String(iso);
+      }
+    }
+
+    async function refreshActivityStatus() {
+      if (!supabaseClient) {
+        setActivityStatus('pingLastStatus', 'not connected');
+        setActivityStatus('pulseLastStatus', 'not connected');
+        return;
+      }
+      try {
+        const { data, error } = await supabaseClient
+          .from('keepalive')
+          .select('last_ping_at, source, note')
+          .eq('id', 1)
+          .maybeSingle();
+        if (error) throw error;
+        if (!data) {
+          setActivityStatus('pingLastStatus', 'no row — run SQL first');
+          setActivityStatus('pulseLastStatus', 'no row — run SQL first');
+          return;
+        }
+        const line = formatTs(data.last_ping_at) + ' · ' + (data.source || '?');
+        if ((data.source || '').indexOf('app') >= 0 || (data.source || '') === 'app-pulse') {
+          setActivityStatus('pulseLastStatus', line);
+        } else {
+          setActivityStatus('pingLastStatus', line);
+        }
+        // show last overall on both if only one source
+        if ((data.source || '').indexOf('app') >= 0) {
+          // keep ping as-is if we only have pulse
+        } else {
+          setActivityStatus('pingLastStatus', line);
+        }
+      } catch (err) {
+        setActivityStatus('pingLastStatus', (err && err.message) || 'error');
+      }
+    }
+
+    /** Admin /ping — heartbeat only, no app UI impact */
+    async function adminPing() {
+      if (!supabaseClient) {
+        toast('Not connected', 'Configure Supabase first.', 'err');
+        return;
+      }
+      if (!state.authenticated) {
+        toast('Auth required', 'Login first.', 'err');
+        return;
+      }
+      try {
+        const ts = await writeKeepalive('admin-ping', '/ping');
+        setActivityStatus('pingLastStatus', formatTs(ts) + ' · admin-ping');
+        logLine('PING · /ping · OK');
+        toast('Ping OK', 'Heartbeat /ping registrado', 'ok');
+      } catch (err) {
+        console.error(err);
+        logLine('PING FAIL · ' + (err.message || err));
+        toast('Ping failed', (err.message || String(err)) + ' — rode o SQL KEEP ALIVE no Supabase.', 'err');
+      }
+    }
+
+    /**
+     * Silent app pulse — mimics member app open:
+     * SELECTs on the same tables the app reads, then a hidden keepalive write.
+     * No title/message/status changes → nothing new appears in the app UI.
+     */
+    async function silentAppPulse() {
+      if (!supabaseClient) {
+        toast('Not connected', 'Configure Supabase first.', 'err');
+        return;
+      }
+      if (!state.authenticated) {
+        toast('Auth required', 'Login first.', 'err');
+        return;
+      }
+      try {
+        // Same read path a member open would typically hit
+        await Promise.all([
+          supabaseClient.from('events').select('id, status, event_date, event_time').order('event_date', { ascending: true }).limit(20),
+          supabaseClient.from('announcements').select('id, title, message, created_at').order('created_at', { ascending: false }).limit(5),
+          supabaseClient.from('fenrir_events').select('id, status, event_date, event_time').order('event_date', { ascending: true }).limit(20),
+          supabaseClient.from('fenrir_announcements').select('id, title, message, created_at').order('created_at', { ascending: false }).limit(5)
+        ]);
+        const ts = await writeKeepalive('app-pulse', 'silent member-path reads');
+        setActivityStatus('pulseLastStatus', formatTs(ts) + ' · app-pulse');
+        logLine('APP PULSE · silent · OK');
+        toast('App pulse OK', 'Leituras silenciosas + heartbeat (nada muda no app)', 'ok');
+      } catch (err) {
+        console.error(err);
+        logLine('APP PULSE FAIL · ' + (err.message || err));
+        toast('App pulse failed', (err.message || String(err)) + ' — confira tabelas/SQL KEEP ALIVE.', 'err');
+      }
+    }
+
     // ---------- Settings ----------
+
     function saveSupabaseConfig() {
       const url = document.getElementById('supabaseUrl').value.trim() || SUPABASE_DEFAULT_URL;
       const key = document.getElementById('supabaseAnonKey').value.trim();

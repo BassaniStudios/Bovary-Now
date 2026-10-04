@@ -291,3 +291,62 @@ ALTER TABLE public.events
 ALTER TABLE public.fenrir_events
   ADD COLUMN IF NOT EXISTS auto_end_hours INTEGER NOT NULL DEFAULT 5;
 
+
+-- =========================================================
+-- KEEP ALIVE / SILENT PULSE (anti-pause)
+-- Run once in Supabase SQL Editor.
+-- Used by admin panel buttons: PING and APP PULSE.
+-- Does not affect member app UI (no visible rows/fields there).
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS public.keepalive (
+  id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  last_ping_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  source TEXT DEFAULT 'unknown',
+  note TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO public.keepalive (id, last_ping_at, source, note)
+VALUES (1, NOW(), 'schema', 'initial')
+ON CONFLICT (id) DO NOTHING;
+
+ALTER TABLE public.keepalive ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "keepalive_select_all" ON public.keepalive;
+CREATE POLICY "keepalive_select_all"
+  ON public.keepalive FOR SELECT
+  TO anon, authenticated
+  USING (true);
+
+DROP POLICY IF EXISTS "keepalive_write_all" ON public.keepalive;
+CREATE POLICY "keepalive_write_all"
+  ON public.keepalive FOR ALL
+  TO anon, authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE OR REPLACE FUNCTION public.ping_keepalive(
+  p_source TEXT DEFAULT 'rpc',
+  p_note TEXT DEFAULT NULL
+)
+RETURNS TIMESTAMPTZ
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  ts TIMESTAMPTZ := NOW();
+BEGIN
+  INSERT INTO public.keepalive (id, last_ping_at, source, note, updated_at)
+  VALUES (1, ts, COALESCE(p_source, 'rpc'), p_note, ts)
+  ON CONFLICT (id) DO UPDATE
+    SET last_ping_at = EXCLUDED.last_ping_at,
+        source = EXCLUDED.source,
+        note = EXCLUDED.note,
+        updated_at = EXCLUDED.updated_at;
+  RETURN ts;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.ping_keepalive(TEXT, TEXT) TO anon, authenticated;

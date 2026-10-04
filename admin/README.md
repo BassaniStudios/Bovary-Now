@@ -27,3 +27,18 @@ Use **END** on an active Fenrir event (or set status to `ended` in the form).
 ## Local open
 
 Open `admin/index.html` in a browser (or serve the folder). Configure Supabase URL + anon key in Settings as before.
+
+## Activity buttons (PING + App Pulse)
+
+Two buttons generate database activity without changing what members see in the app:
+
+| Button | Where | What it does |
+|--------|--------|----------------|
+| **PING · /ping** | Dashboard + Settings | Writes a heartbeat to table `keepalive` (source `admin-ping`) |
+| **APP PULSE** | Dashboard + Settings | Runs the same SELECTs the member app would on open (events, announcements, fenrir_*) then a silent heartbeat (source `app-pulse`). **No visible UI change in the app.** |
+
+### Setup
+
+1. Run the **KEEP ALIVE** block at the end of `database/supabase_schema.sql` in the Supabase SQL Editor.
+2. Open the admin panel, login, click **PING** or **APP PULSE**.
+
